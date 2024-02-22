@@ -31,7 +31,7 @@ q群3：108698205，如果进了技术群，请先看群公告再问问题，不
 
 4. 通过 Main 方法启动后端服务 `\ab-spring-boot\ab-spring-boot-app\src\main\java\com\dstz\AbSpringBootApp.java`，默认端口为 `8080`
 
-5. 下载 前端工程 `agilebpm-ui` ，并在根目录下 执行 命令 `yarn install`
+5. 下载 [前端工程](https://gitee.com/agile-bpm/agilebpm-ui) `agilebpm-ui` ，并在根目录下 执行 命令 `yarn install`
 
 6. 完成安装后，在 `vite.config.ts`中修改后台服务地址，如 `http://localhost:8080/` 然后执行 ` npm run dev ` 启动前端项目。
 
