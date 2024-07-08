@@ -36,4 +36,11 @@ public interface SysAuthorizationApi {
      * @param id
      */
     void deleteAuthorizationByRights(RightsObjectConstants document, String id);
+
+    /**
+     * 导入授权信息
+     * 通过 业务类型(rightsObject) 和 rightsTarget 来判断是新增还是修改
+     * @param authorizationDTOS
+     */
+    void importAuthorization(List<SysAuthorizationDTO> authorizationDTOS);
 }

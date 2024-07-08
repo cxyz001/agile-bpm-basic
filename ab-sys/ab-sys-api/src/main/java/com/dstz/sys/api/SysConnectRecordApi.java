@@ -26,6 +26,15 @@ public interface SysConnectRecordApi {
     List<SysConnectRecordVO> getByTargetId(String targetId, String type);
 
     /**
+     * 通过 SourceID和type 获取关联信息
+     *
+     * @param sourceIds 资源id 集合
+     * @param type
+     * @return
+     */
+    List<SysConnectRecordVO> getBySourceId(List<String> sourceIds, String type);
+
+    /**
      * 批量保存
      *
      * @param records

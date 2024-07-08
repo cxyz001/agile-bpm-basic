@@ -5,11 +5,13 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="SysConfiguration" type="com.dstz.sys.core.entity.SysConfiguration">
         <id column="id_" property="id" />
-        <result column="conf_type_" property="confType" />
-        <result column="conf_env_" property="confEnv" />
-        <result column="conf_json_" property="confJson" />
+        <result column="code_" property="code" />
+        <result column="env_" property="env" />
+        <result column="json_" property="json" />
         <result column="is_enable_" property="isEnable" />
         <result column="is_encrypt_" property="isEncrypt" />
+        <result column="name_" property="name" />
+        <result column="desc_" property="desc" />
         <result column="create_by_" property="createBy" />
         <result column="create_time_" property="createTime" />
         <result column="update_by_" property="updateBy" />

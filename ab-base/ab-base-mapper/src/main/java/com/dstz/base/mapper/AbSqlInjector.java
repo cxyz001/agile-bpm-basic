@@ -25,12 +25,12 @@ public class AbSqlInjector extends DefaultSqlInjector {
 	public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
 		List<AbstractMethod> methods = super.getMethodList(mapperClass, tableInfo);
 		methods.add(new AbQuery());//增加AB的query方法进入mapper
-		// 增加批量创建
-		methods.add(new AbBulkCreate());
 		// 增加 根据ID完整性更新
 		methods.add(new AbUpdateFullById());
 		// 增加 根据查询条件获取游标
 		methods.add(new AbQueryCursorByWrapper());
+		// 增加 批量插入方法
+		methods.add(new AbBulkCreate());
 		return methods;
 	}
 }

@@ -60,4 +60,6 @@ public interface SysResourceApi {
 	 * 获取移动端办理事项的资源
 	 */
 	ISysResource getTodoResource();
+
+	void deleteByCode(List<String> codeList);
 }

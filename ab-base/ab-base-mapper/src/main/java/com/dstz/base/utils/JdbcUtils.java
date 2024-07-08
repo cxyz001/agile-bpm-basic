@@ -34,24 +34,4 @@ public class JdbcUtils {
         }
     }
 
-    /**
-     * 获取连接产品名称
-     *
-     * @param dataSource 数据源
-     * @return 连接产品名称
-     */
-    public static String getConnectionProductName(DataSource dataSource) {
-        Connection connection = null;
-        try {
-            connection = DataSourceUtils.getConnection(dataSource);
-            return connection.getMetaData().getDatabaseProductName();
-        } catch (SQLException e) {
-            ExceptionUtil.wrapAndThrow(e);
-            return null;
-        } finally {
-            if (connection != null) {
-                DataSourceUtils.releaseConnection(connection, dataSource);
-            }
-        }
-    }
 }

@@ -9,15 +9,6 @@ package com.dstz.base.common.property;
 public interface SysPropertyService {
 
     /**
-     * 根据别名返回字符串参数值。
-     *
-     * @param code 参数编码
-     * @return 参数值
-     */
-    String getValByCode(String code);
-
-
-    /**
      * 根据别名返回整型参数值。
      *
      * @param code 参数编码
@@ -40,5 +31,13 @@ public interface SysPropertyService {
      * @return 参数值
      */
     Boolean getBooleanByCode(String code);
+
+    /**
+     * 根据别名返回字符串参数值。
+     *
+     * @param code 参数编码
+     * @return 参数值
+     */
+	String getValByCode(String code);
 
 }

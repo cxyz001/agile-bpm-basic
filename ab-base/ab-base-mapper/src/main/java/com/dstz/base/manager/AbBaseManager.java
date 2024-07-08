@@ -1,16 +1,16 @@
 package com.dstz.base.manager;
 
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.dstz.base.api.dto.PageListDTO;
 import com.dstz.base.api.dto.QueryParamDTO;
 import com.dstz.base.entity.IPersistentEntity;
 import com.dstz.base.query.AbQueryFilter;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * AB 通用业务处理，所有通用业务处理应实现
@@ -201,26 +201,26 @@ public interface AbBaseManager<T extends IPersistentEntity> {
      * @return 影响行数
      */
     void bulkCreate(Iterable<T> list, int size);
-
+    
     /**
      * <pre>
      * ab系统大部分业务都有根据编码获取对象
      * ps：使用者清楚知道自己操作的model是有code_字段才能用
-     * </pre>
-     *
+     * </pre>	
+     * 
      * @param code
      * @return
      */
-    T getByCode(String code);
-
-    /**
-     * <pre>
-     * 业务model存在编码时进行编码唯一性校验
-     * </pre>
-     *
-     * @param entity
-     * @param code
-     * @return true：通过校验|false：校验失败
-     */
-    boolean checkCode(T entity, String code);
+	T getByCode(String code);
+	
+	/**
+	 * <pre>
+	 * 业务model存在编码时进行编码唯一性校验
+	 * </pre>
+	 * 
+	 * @param entity
+	 * @param code
+	 * @return true：通过校验|false：校验失败
+	 */
+	boolean checkCode(T entity, String code);
 }

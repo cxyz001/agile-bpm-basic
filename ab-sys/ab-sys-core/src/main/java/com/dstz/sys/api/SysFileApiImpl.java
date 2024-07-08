@@ -1,6 +1,8 @@
 package com.dstz.sys.api;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dstz.base.common.utils.BeanCopierUtils;
 import com.dstz.sys.api.dto.SysFileDTO;
 import com.dstz.sys.core.entity.SysFile;
@@ -30,6 +32,18 @@ public class SysFileApiImpl implements SysFileApi {
     }
 
     @Override
+    public void upload(InputStream is, String fileId, String fileName) {
+        SysFile file = sysFileManager.getById(fileId);
+        //如果文件不存在,则直接创建,存在则修改path和名称即可.
+        if (ObjUtil.isNull(file)) {
+            sysFileManager.upload(is, fileId, fileName, null);
+        } else {
+            String path = sysFileManager.uploader(is, fileId, fileName, null);
+            sysFileManager.update(null, Wrappers.lambdaUpdate(SysFile.class).eq(SysFile::getId, fileId).set(SysFile::getName, fileName).set(SysFile::getPath, path));
+        }
+    }
+
+    @Override
     public InputStream download(String fileId) {
         return sysFileManager.download(fileId);
     }
@@ -43,9 +57,9 @@ public class SysFileApiImpl implements SysFileApi {
             sysFileManager.delete(id);
         }
     }
-
+    
     @Override
     public SysFileDTO getById(String fileId) {
-        return BeanCopierUtils.transformBean(getById(fileId), SysFileDTO.class);
+        return BeanCopierUtils.transformBean(sysFileManager.getById(fileId), SysFileDTO.class);
     }
 }

@@ -13,6 +13,7 @@
         <result column="card_template_" property="cardTemplate"/>
         <result column="app_template_" property="appTemplate"/>
         <result column="template_param_" property="templateParam"/>
+        <result column="sms_template_code_" property="smsTemplateCode"/>
         <result column="enabled_" property="enabled"/>
         <result column="is_delete_" property="isDelete"/>
         <result column="create_time_" property="createTime"/>

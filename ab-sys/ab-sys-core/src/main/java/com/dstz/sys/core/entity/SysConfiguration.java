@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.dstz.base.entity.AbModel;
+
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.io.Serializable;
 
@@ -26,20 +28,20 @@ public class SysConfiguration extends AbModel<SysConfiguration> {
     /**
      * 配置类型
      */
-    @TableField("conf_type_")
-    private String confType;
+    @TableField("code_")
+    private String code;
 
     /**
      * 配置所属环境
      */
-    @TableField("conf_env_")
-    private String confEnv;
+    @TableField("env_")
+    private String env;
 
     /**
      * 配置json
      */
-    @TableField("conf_json_")
-    private String confJson;
+    @TableField("json_")
+    private String json;
 
     /**
      * 是否可用
@@ -52,6 +54,18 @@ public class SysConfiguration extends AbModel<SysConfiguration> {
      */
     @TableField("is_encrypt_")
     private Integer isEncrypt;
+
+    /**
+     * 是否加密
+     */
+    @TableField("name_")
+    private String name;
+
+    /**
+     * 是否加密
+     */
+    @TableField("desc_")
+    private String desc;
 
     /**
      * 创建人
@@ -86,89 +100,118 @@ public class SysConfiguration extends AbModel<SysConfiguration> {
     public void setId(String id) {
         this.id = id;
     }
-    
-    public String getConfType() {
-        return confType;
+
+    public String getCode() {
+        return code;
     }
-    
-    public void setConfType(String confType) {
-        this.confType = confType;
+
+    public void setCode(String code) {
+        this.code = code;
     }
-    
-    public String getConfEnv() {
-        return confEnv;
+
+    public String getEnv() {
+        return env;
     }
-    
-    public void setConfEnv(String confEnv) {
-        this.confEnv = confEnv;
+
+    public void setEnv(String env) {
+        this.env = env;
     }
-    
-    public String getConfJson() {
-        return confJson;
+
+    public String getJson() {
+        return json;
     }
-    
-    public void setConfJson(String confJson) {
-        this.confJson = confJson;
+
+    public void setJson(String json) {
+        this.json = json;
     }
-    
+
     public Integer getIsEnable() {
         return isEnable;
     }
-    
+
     public void setIsEnable(Integer isEnable) {
         this.isEnable = isEnable;
     }
-    
+
     public Integer getIsEncrypt() {
         return isEncrypt;
     }
-    
+
     public void setIsEncrypt(Integer isEncrypt) {
         this.isEncrypt = isEncrypt;
     }
-    
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     @Override
     public String getCreateBy() {
         return createBy;
     }
-    
+
     @Override
     public void setCreateBy(String createBy) {
         this.createBy = createBy;
     }
-    
+
     @Override
     public Date getCreateTime() {
         return createTime;
     }
-    
+
     @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
-    
+
     @Override
     public String getUpdateBy() {
         return updateBy;
     }
-    
+
     @Override
     public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
     }
-    
+
     @Override
     public Date getUpdateTime() {
         return updateTime;
     }
-    
+
     @Override
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
-    @Override
-    public Serializable pkVal() {
-        return this.id;
+    public SysConfiguration() {
+    }
+
+    public SysConfiguration(String id, String code, String env, String json, Integer isEnable, Integer isEncrypt, String name, String desc, String createBy, Date createTime, String updateBy, Date updateTime) {
+        this.id = id;
+        this.code = code;
+        this.env = env;
+        this.json = json;
+        this.isEnable = isEnable;
+        this.isEncrypt = isEncrypt;
+        this.name = name;
+        this.desc = desc;
+        this.createBy = createBy;
+        this.createTime = createTime;
+        this.updateBy = updateBy;
+        this.updateTime = updateTime;
     }
 }

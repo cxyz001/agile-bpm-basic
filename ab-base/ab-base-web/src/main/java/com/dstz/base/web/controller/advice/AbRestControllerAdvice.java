@@ -1,11 +1,15 @@
 package com.dstz.base.web.controller.advice;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.dstz.base.api.vo.ApiResponse;
 import com.dstz.base.common.enums.GlobalApiCodes;
 import com.dstz.base.common.exceptions.ApiException;
 import com.dstz.base.common.exceptions.BusinessMessage;
+import com.dstz.base.common.script.ScriptLog;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -75,6 +80,17 @@ public class AbRestControllerAdvice {
             code = GlobalApiCodes.INTERNAL_ERROR.getCode();
             message ="PROD".equalsIgnoreCase(SpringUtil.getActiveProfile()) ? GlobalApiCodes.INTERNAL_ERROR.getMessage() : rootCause.toString();
         }
-        return ApiResponse.fail(code, message);
+        ApiResponse<Void> res = ApiResponse.fail(code, message);
+        
+        // 脚本日志输出
+        if(ScriptLog.isOpenScriptLog()) {
+        	List<String> msgs = ScriptLog.getMsgsAndClear();
+			// 设置返回值
+			if(CollUtil.isNotEmpty(msgs)) {
+				res.setScriptLog(StrUtil.join("\n", msgs));
+			}
+        }
+        
+        return res;
     }
 }

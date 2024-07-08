@@ -28,7 +28,8 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping(AbAppRestConstant.SYS_SERVICE_PREFIX + "/script")
-public class SysScriptController extends AbCrudController<SysScript> {
+public class
+SysScriptController extends AbCrudController<SysScript> {
 
     private static final Logger logger = LoggerFactory.getLogger(SysScriptController.class);
 

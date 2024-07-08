@@ -1,5 +1,6 @@
 package com.dstz.component.msg.api.dto;
 
+import com.dstz.base.common.constats.StrPool;
 import com.dstz.base.common.identityconvert.SysIdentity;
 
 import java.io.Serializable;
@@ -19,6 +20,9 @@ public class MsgDTO implements Serializable {
     //标题
     private String subject;
 
+    //html模板
+    private String htmlTemplate;
+
     //模板key
     private String templateCode;
 
@@ -37,13 +41,26 @@ public class MsgDTO implements Serializable {
     //格式化所需系统参数
     private Object object;
 
+
+
     //扩展参数
     private Map<String, Object> extendVars = new HashMap<String, Object>();
 
     public MsgDTO() {
     }
 
-    public MsgDTO(String subject, String templateCode,  List<SysIdentity> receivers, List<String> msgType, Object object) {
+    public MsgDTO(String subject, List<String> msgType, String htmlTemplate, List<SysIdentity> receivers, String businessId, String innerMsgType, Object object, Map<String, Object> extendVars) {
+        this.subject = subject;
+        this.msgType = msgType;
+        this.htmlTemplate = htmlTemplate;
+        this.receivers = receivers;
+        this.businessId = businessId;
+        this.innerMsgType = innerMsgType;
+        this.object = object;
+        this.extendVars = extendVars;
+    }
+
+    public MsgDTO(String subject, String templateCode, List<SysIdentity> receivers, List<String> msgType, Object object) {
         this.subject = subject;
         this.templateCode = templateCode;
         this.receivers = receivers;
@@ -71,6 +88,15 @@ public class MsgDTO implements Serializable {
         this.msgType = msgType;
         this.object = object;
         this.extendVars = extendVars;
+    }
+
+
+    public String getHtmlTemplate() {
+        return htmlTemplate;
+    }
+
+    public void setHtmlTemplate(String htmlTemplate) {
+        this.htmlTemplate = htmlTemplate;
     }
 
     public Object getObject() {

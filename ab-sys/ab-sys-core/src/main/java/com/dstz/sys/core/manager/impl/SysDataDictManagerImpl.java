@@ -3,6 +3,8 @@ package com.dstz.sys.core.manager.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.dstz.base.api.dto.QueryParamDTO;
+import com.dstz.base.common.cache.ICache;
+import com.dstz.base.common.constats.AbCacheRegionConstant;
 import com.dstz.base.common.constats.StrPool;
 import com.dstz.base.common.exceptions.BusinessMessage;
 import com.dstz.base.common.utils.BeanConversionUtils;
@@ -11,10 +13,11 @@ import com.dstz.base.manager.impl.AbBaseManagerImpl;
 import com.dstz.base.query.AbQueryFilter;
 import com.dstz.base.query.impl.DefaultAbQueryFilter;
 import com.dstz.sys.api.constant.SysApiCodes;
+import com.dstz.sys.api.constant.SysCackeKeyConstant;
+import com.dstz.sys.api.vo.SysDataDictVO;
 import com.dstz.sys.core.entity.SysDataDict;
 import com.dstz.sys.core.manager.SysDataDictManager;
 import com.dstz.sys.core.mapper.SysDataDictMapper;
-import com.dstz.sys.rest.model.vo.SysDataDictVO;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -32,9 +35,11 @@ import java.util.stream.Collectors;
 public class SysDataDictManagerImpl extends AbBaseManagerImpl<SysDataDict> implements SysDataDictManager {
 
     private final SysDataDictMapper sysDataDictMapper;
+    private final ICache cache;
 
-    public SysDataDictManagerImpl(SysDataDictMapper sysDataDictMapper) {
+    public SysDataDictManagerImpl(SysDataDictMapper sysDataDictMapper, ICache cache) {
         this.sysDataDictMapper = sysDataDictMapper;
+        this.cache = cache;
     }
 
     @Override
@@ -57,11 +62,11 @@ public class SysDataDictManagerImpl extends AbBaseManagerImpl<SysDataDict> imple
         return setRoot(BeanConversionUtils.listToTree(sysDataDictVOList));
     }
 
-    private List<SysDataDictVO> setRoot(List<SysDataDictVO> dictTree){
+    private List<SysDataDictVO> setRoot(List<SysDataDictVO> dictTree) {
         SysDataDict parent = new SysDataDict();
         parent.setName("所有数据");
 
-        SysDataDictVO vo= BeanCopierUtils.transformBean(parent,SysDataDictVO.class);
+        SysDataDictVO vo = BeanCopierUtils.transformBean(parent, SysDataDictVO.class);
         vo.setChildren(dictTree);
         return Arrays.asList(vo);
     }
@@ -89,26 +94,31 @@ public class SysDataDictManagerImpl extends AbBaseManagerImpl<SysDataDict> imple
         return result;
     }
 
-    private List<SysDataDictVO> getDictByTypeCode(String typeCode){
-        List<SysDataDict> dictTypeList = sysDataDictMapper.selectList(Wrappers.<SysDataDict>lambdaQuery().eq(SysDataDict::getDictType,SysDataDict.TYPE_DICT)
-                .eq(SysDataDict::getTypeCode,typeCode));
+    private List<SysDataDictVO> getDictByTypeCode(String typeCode) {
+        List<SysDataDict> dictTypeList = sysDataDictMapper.selectList(Wrappers.<SysDataDict>lambdaQuery().eq(SysDataDict::getDictType, SysDataDict.TYPE_DICT)
+                .eq(SysDataDict::getTypeCode, typeCode));
         return BeanCopierUtils.transformList(dictTypeList, SysDataDictVO.class);
     }
 
 
     @Override
-    public int removeByIds(Collection<? extends Serializable> ids){
-        for (Serializable entityId : ids){
-            SysDataDict entity = sysDataDictMapper.selectById(entityId);
-            if (entity == null) {
-                continue;
-            }
-            if (Integer.valueOf(StrPool.BOOLEAN_TRUE).equals(entity.getIsSystem())){
-                throw new BusinessMessage(SysApiCodes.DICT_DELETE_ERROR.formatDefaultMessage(entity.getName()));
-            }
-            removeByEntity(entity);
+    public int removeByIds(Collection<? extends Serializable> ids) {
+        for (Serializable entityId : ids) {
+            removeById(entityId);
         }
         return ids.size();
+    }
+
+    @Override
+    public int removeById(Serializable id) {
+        SysDataDict entity = sysDataDictMapper.selectById(id);
+        if (entity == null) {
+            return 0;
+        }
+        if (Integer.valueOf(StrPool.BOOLEAN_TRUE).equals(entity.getIsSystem())) {
+            throw new BusinessMessage(SysApiCodes.DICT_DELETE_ERROR.formatDefaultMessage(entity.getName()));
+        }
+        return removeByEntity(entity);
     }
 
     /**
@@ -116,12 +126,14 @@ public class SysDataDictManagerImpl extends AbBaseManagerImpl<SysDataDict> imple
      *
      * @param entity
      */
-    private void removeByEntity(SysDataDict entity) {
+    private int removeByEntity(SysDataDict entity) {
         List<SysDataDict> dataDictChildren = sysDataDictMapper.getByParentId(entity.getId());
         for (SysDataDict dict : dataDictChildren) {
             removeByEntity(dict);
         }
-        sysDataDictMapper.deleteById(entity.getId());
+        int result =  sysDataDictMapper.deleteById(entity.getId());
+        cache.invalidate(AbCacheRegionConstant.DICT_CACHE_REGION, SysCackeKeyConstant.GET_DICT_NODE_LIST + entity.getDictKey());
+        return result;
     }
 
 
@@ -137,6 +149,7 @@ public class SysDataDictManagerImpl extends AbBaseManagerImpl<SysDataDict> imple
         saveCheck(dataDict);
         return super.update(dataDict);
     }
+
 
     private void saveCheck(SysDataDict dataDict) {
         String dictType = dataDict.getDictType();
@@ -155,5 +168,22 @@ public class SysDataDictManagerImpl extends AbBaseManagerImpl<SysDataDict> imple
         if (!SysDataDict.TYPE_DICT.equals(dictType) && !SysDataDict.TYPE_NODE.equals(dictType)) {
             throw new BusinessMessage(SysApiCodes.DICT_KEY_TYPE_ERROR);
         }
+    }
+
+    @Override
+    public void updateCache(Set<String> dictKeys) {
+        List<SysDataDict> sysDataDictList = this.selectByWrapper(Wrappers.lambdaQuery(SysDataDict.class).
+                eq(SysDataDict::getDictType, SysDataDict.TYPE_NODE).
+                in(SysDataDict::getDictKey, dictKeys));
+
+        Map<String, List<SysDataDict>> dictKeyMap = sysDataDictList.stream().collect(Collectors.groupingBy(SysDataDict::getDictKey));
+
+        dictKeyMap.forEach((dictKey, dictList) -> {
+            if (CollUtil.isNotEmpty(dictList)) {
+                List<SysDataDictVO> data = BeanCopierUtils.transformList(dictList, SysDataDictVO.class);
+                cache.put(AbCacheRegionConstant.DICT_CACHE_REGION, SysCackeKeyConstant.GET_DICT_NODE_LIST + dictKey, data);
+            }
+        });
+
     }
 }

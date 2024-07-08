@@ -1,5 +1,6 @@
 package com.dstz.base.query;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.session.RowBounds;
 
@@ -47,7 +48,7 @@ public class AbPage extends Page implements Map<String, Object> {
 
     @Override
     public boolean isEmpty() {
-        return params.isEmpty();
+        return CollUtil.isEmpty(params);
     }
 
     @Override

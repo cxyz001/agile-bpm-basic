@@ -8,10 +8,49 @@
         <result column="handover_user_id_" property="handoverUserId"/>
         <result column="receive_user_id_" property="receiveUserId"/>
         <result column="receive_chain_" property="receiveChain"/>
+        <result column="desc_" property="desc"/>
         <result column="create_time_" property="createTime"/>
         <result column="create_by_" property="createBy"/>
         <result column="creator_" property="creator"/>
     </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="SysWorkHandoverVO" type="com.dstz.sys.rest.model.vo.SysWorkHandoverVO">
+        <id column="id_" property="id"/>
+        <result column="handover_user_id_" property="handoverUserId"/>
+        <result column="receive_user_id_" property="receiveUserId"/>
+        <result column="create_time_" property="createTime"/>
+        <result column="handover_name_" property="handoverName"/>
+        <result column="receive_name_" property="receiveName"/>
+        <result column="desc_" property="desc"/>
+    </resultMap>
+
+
+    <select id="query" parameterType="java.util.Map" resultMap="SysWorkHandoverVO">
+        SELECT
+            wh.id_,
+            wh.handover_user_id_,
+            h.fullname_  handover_name_,
+            r.fullname_  receive_name_,
+            wh.create_time_,
+            wh.desc_
+        FROM sys_work_handover wh
+                 LEFT JOIN org_user h ON h.id_ = wh.handover_user_id_
+                 LEFT JOIN org_user r ON r.id_ = wh.receive_user_id_
+        <where>
+            <if test="whereSql!=null">
+                ${whereSql}
+            </if>
+        </where>
+        <if test="orderBySql!=null">
+            ORDER BY ${orderBySql}
+        </if>
+        <if test="orderBySql==null">
+            ORDER BY id_ DESC
+        </if>
+    </select>
+
+
 
     <select id="selectByReceiveUserId" parameterType="string" resultMap="SysWorkHandover">
         SELECT *

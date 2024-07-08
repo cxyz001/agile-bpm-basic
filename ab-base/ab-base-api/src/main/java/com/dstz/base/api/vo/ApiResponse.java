@@ -38,6 +38,11 @@ public class ApiResponse<T> {
      * 信息
      */
     private String message;
+    
+    /**
+     * 脚本日志，需要开启 scriptLog才返回
+    */
+    private String scriptLog;
 
 	/**
      * 响应体
@@ -199,4 +204,13 @@ public class ApiResponse<T> {
                 ", data=" + data +
                 '}';
     }
+
+	public String getScriptLog() {
+		return scriptLog;
+	}
+
+	public void setScriptLog(String scriptLog) {
+		this.scriptLog = scriptLog;
+	}
+
 }

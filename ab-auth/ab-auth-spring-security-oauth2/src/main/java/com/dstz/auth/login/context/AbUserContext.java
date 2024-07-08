@@ -3,6 +3,7 @@ package com.dstz.auth.login.context;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+
 import com.dstz.auth.model.LoginUser;
 import com.dstz.base.common.context.UserContext;
 import com.dstz.base.common.property.PropertyEnum;
@@ -11,6 +12,8 @@ import com.dstz.org.api.GroupApi;
 import com.dstz.org.api.enums.GroupType;
 import com.dstz.org.api.model.IGroup;
 import com.dstz.org.api.model.IUser;
+
+import org.apache.commons.collections4.SetUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -45,7 +48,7 @@ public class AbUserContext implements UserContext, InitializingBean {
 		Optional<IGroup> org;
 		Collection<String> authorizes;
 		Boolean superAdmin;
-	}
+	} 
 
 	private static ThreadLocalVariable getThreadLocalVariable() {
 		ThreadLocalVariable threadLocalVariable = THREAD_LOCAL.get();
@@ -138,5 +141,10 @@ public class AbUserContext implements UserContext, InitializingBean {
 	@Override
 	public void afterPropertiesSet() {
 		ContextCleanUtils.register(this::clear, ContextCleanUtils.Phase.values());
+	}
+
+	@Override
+	public Set<String> getFilterUserIds(String userId) {
+		return SetUtils.hashSet(userId);
 	}
 }

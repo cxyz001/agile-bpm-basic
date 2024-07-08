@@ -103,4 +103,9 @@ public class SysResourceApiImpl implements SysResourceApi {
         return BeanCopierUtils.transformBean(resources.get(0), SysResourceVO.class);
     }
 
+	@Override
+	public void deleteByCode(List<String> codeList) {
+		this.deleteResourceByCode(codeList);
+	}
+
 }

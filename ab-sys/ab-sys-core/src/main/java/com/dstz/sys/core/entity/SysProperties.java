@@ -1,6 +1,8 @@
 package com.dstz.sys.core.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.dstz.base.common.constats.NumberPool;
+import com.dstz.base.common.freemark.IFreemarkerEngine;
 import com.dstz.base.common.valuemap.AbValueMap;
 import com.dstz.base.common.valuemap.AbValueMapType;
 import com.dstz.base.entity.AbModel;
@@ -148,6 +150,9 @@ public class SysProperties extends AbModel<SysProperties> {
     }
     
     public Integer getEncrypt() {
+        if(encrypt == null){
+            return NumberPool.BOOLEAN_FALSE;
+        }
         return encrypt;
     }
     

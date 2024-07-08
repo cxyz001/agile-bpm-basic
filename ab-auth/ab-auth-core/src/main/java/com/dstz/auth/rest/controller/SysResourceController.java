@@ -76,7 +76,7 @@ public class SysResourceController extends AbCrudController<SysResource> {
      * @param sysResource @throws Exception void @throws
      */
     @Override
-    @RequestMapping("save")
+    @RequestMapping("saveSysResource")
     public ApiResponse<String> save(@RequestBody SysResource sysResource) {
         return ApiResponse.success(sysResourceManager.saveSysResource(sysResource));
     }

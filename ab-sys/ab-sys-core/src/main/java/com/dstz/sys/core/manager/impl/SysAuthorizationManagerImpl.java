@@ -15,6 +15,7 @@ import com.dstz.sys.core.mapper.SysAuthorizationMapper;
 import com.dstz.sys.rest.model.dto.AuthorizationDTO;
 import org.springframework.stereotype.Service;
 
+import java.sql.Struct;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,8 @@ public class SysAuthorizationManagerImpl extends AbBaseManagerImpl<SysAuthorizat
 
     private static final String RIGHT_TYPE_USER = "user";
     private static final String RIGHT_TYPE_ALL = "all";
+    private static final String RIGHT_TYPE_CURRENT_ORG = "currentOrg";
+
 
     private final SysAuthorizationMapper sysAuthorizationMapper;
     private final GroupApi groupApi;
@@ -63,6 +66,20 @@ public class SysAuthorizationManagerImpl extends AbBaseManagerImpl<SysAuthorizat
 
         for (IGroup group : list) {
             rights.add(String.format("%s-%s", group.getGroupId(), group.getGroupType()));
+        }
+        
+        // 获取 当前部门的path，并返回
+        String path = UserContextUtils.getGroup()
+        		.map((currentGroup)-> currentGroup.getAttrValue("path", String.class) )
+        		.orElse(null);
+        
+        if(path != null) {
+        	String [] pathList = path.split("\\.");
+        	for(String p : pathList) {
+        		if(StrUtil.isBlank(p))continue;
+        		
+        		rights.add(String.format("%s-%s", p, RIGHT_TYPE_CURRENT_ORG));
+        	}
         }
 
         return rights;

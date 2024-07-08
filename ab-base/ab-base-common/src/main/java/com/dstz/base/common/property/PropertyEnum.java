@@ -8,6 +8,7 @@ package com.dstz.base.common.property;
  */
 public enum PropertyEnum implements IBaseProperty {
 
+
     ADMIN_ACCOUNTS("admin.accounts", "admin", "admin账户"),
     JDBC_TYPE("spring.jdbc.dbType", "", "数据库类型"),
     FORM_DEF_BACKUP_PATH("formDefBackupPath", "", "表单备份地址"),
@@ -69,6 +70,59 @@ public enum PropertyEnum implements IBaseProperty {
 
     ONLINE_DOC_SERVICE_URL("online_doc_service_url","http://192.168.1.141:18080","在线文档服务地址"),
     AGILEBPM_SERVICE_URL("agilebpm_service_url","http://192.168.1.6:8080","agilebpm服务地址"),
+    ONLINE_DOC_SERVICE_AGENT_PREFIX("online_doc_service_agent_prefix","/weboffice","在线文档服务代理前缀"),
+
+    PC_URL("pcUrl","http://localhost:8086","pc端服务地址"),
+    APP_URL("appUrl","http://localhost:5173/#","移动端服务端的地址"),
+    MOBILE_URL("mobileUrl","http://localhost:5173","移动端服务端的地址"),
+    WORD_OFFICE_HOME("ab.word.office-home", "", "LibreOfficePortable文件位置"),
+    WORD_OFFICE_HOST("ab.word.office-host", "", "LibreOfficePortable线上版"),
+    SCRIPT_LOG("script_log", "false", "脚本日志开关"),
+
+    DISABLED_AREA("DISABLED_AREA","河南省.郑州市,福建省.莆田市,","产品禁用地"),
+
+    /**
+     * token是否放入cookie
+     */
+     tokenCookieSwitch("ab.security.token-cookie-switch", false, "token是否放入cookie"),
+
+    /**
+     * 系统临时用户名
+     */
+    SYS_TEMP_USER_NAME("sys.temporary.user.name","temporaryUsers","系统临时用户名"),
+
+
+    /**
+     * 系统临时开放应用id
+     */
+    SYS_TEMP_OPEN_APP_ID("sys.temporary.open.appId","openPlatform","系统临时开放应用id"),
+
+    /**
+     * 前端加密密钥
+     */
+    LE_ENCRYPTION_KEY("ab.secret-key", "am2.8basic", "前端加密密钥"),
+
+    /**
+     * 后端接口Nginx代理名称
+     */
+    API_NGINX_AGENT_PREFIX("api.nginx.agent.prefix","","后端接口Nginx代理名称"),
+    
+    /**
+     * 编码是否默认增加scode
+     */
+    IS_SCODE("isScode", true, "编码是否默认增加scode"),
+
+    SALARY_DEF_KEY("salary_def_key", "gzffqr", "薪酬管理默认启动流程key"),
+
+    SALARY_BO_KEY("salary_bo_key", "gzt", "薪酬管理默认启动流程key"),
+
+
+
+
+    USER_REGISTER_BPM_DEF_KEY("userRegisterBpmDefKey","dstz_appstore_user_register","用户注册流程定义key"),
+    USER_REGISTER_BO_CODE("userRegisterBoCode","dstz_appstore_user","用户注册业务对象code"),
+
+    DD_CALL_BACK_URL("dd_call_back_url","/api/ab-bpm/bpm/task/dealTaskByThird","钉钉卡片点击同意时的回调注册地址"),
     ;
 
 
@@ -84,18 +138,19 @@ public enum PropertyEnum implements IBaseProperty {
         this.desc = desc;
     }
 
-    @Override
-    public String getKey() {
-        return key;
-    }
+	@Override
+	public String getKey() {
+		return this.key;
+	}
 
-    @Override
-    public String getDesc() {
-        return desc;
-    }
+	@Override
+	public String getDesc() {
+		return this.desc;
+	}
 
-    @Override
-    public Object getDefaultValue() {
-        return defaultValue;
-    }
+	@Override
+	public Object getDefaultValue() {
+		return this.defaultValue;
+	}
+
 }

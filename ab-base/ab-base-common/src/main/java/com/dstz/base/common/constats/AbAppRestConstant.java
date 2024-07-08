@@ -47,4 +47,14 @@ public class AbAppRestConstant {
      * SYS前缀（目前依附在bpm微服务下）
      */
     public static final String SYS_SERVICE_PREFIX = BPM_SERVICE_PREFIX + "/sys";
+
+    /**
+     * 薪酬管理salary前缀（目前依附在bpm微服务下）
+     */
+    public static final String SALARY_SERVICE_PREFIX = BPM_SERVICE_PREFIX + "/salary";
+
+    /**
+     * 应用市场appstore前缀（目前依附在bpm微服务下）
+     */
+    public static final String APPSTORE_SERVICE_PREFIX = BPM_SERVICE_PREFIX + "/appstore";
 }

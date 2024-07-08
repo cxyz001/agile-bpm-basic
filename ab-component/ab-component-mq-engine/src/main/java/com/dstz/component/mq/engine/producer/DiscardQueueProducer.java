@@ -28,7 +28,7 @@ public class DiscardQueueProducer implements JmsProducer {
                 sendToQueue(Collections.singletonList(message));
             }
         } catch (Exception e) {
-            throw new BusinessException(MqExceptionCodeConstant.SEND_ERROR, e);
+            throw new BusinessException(MqExceptionCodeConstant.SEND_ERROR.formatDefaultMessage(e.getMessage()), e);
         }
     }
 
@@ -39,7 +39,7 @@ public class DiscardQueueProducer implements JmsProducer {
                 logger.info("discard message: {}", JsonUtils.toJSONString(messages));
             }
         } catch (Exception e) {
-            throw new BusinessException(MqExceptionCodeConstant.SEND_ERROR, e);
+            throw new BusinessException(MqExceptionCodeConstant.SEND_ERROR.formatDefaultMessage(e.getMessage()), e);
         }
     }
 }

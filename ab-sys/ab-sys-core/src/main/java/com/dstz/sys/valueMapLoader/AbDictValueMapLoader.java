@@ -40,7 +40,6 @@ public class AbDictValueMapLoader implements AbValueMapLoader<String, Object> {
 			return Collections.emptyMap();
 		}
 		List<SysDataDict> sysDataDictList = sysDataDictManager.selectByWrapper(Wrappers.lambdaQuery(SysDataDict.class)
-		                                                                               .eq(SysDataDict::getTypeCode, SysDataDict.SYSTEM_DEFAULT_TYPE)
 		                                                                               .eq(SysDataDict::getDictKey, dictKey)
 		                                                                               .in(SysDataDict::getCode, mapKeys)
 		                                                                               .eq(SysDataDict::getDictType, SysDataDict.TYPE_NODE));

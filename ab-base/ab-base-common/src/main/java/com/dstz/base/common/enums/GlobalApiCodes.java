@@ -8,6 +8,7 @@ import com.dstz.base.common.codes.IBaseCode;
  *
  * @author wacxhs
  * @since 2022-01-22
+ * 版权: 深圳市大世同舟信息科技有限公司
  */
 public enum GlobalApiCodes implements IBaseCode {
 
@@ -46,7 +47,7 @@ public enum GlobalApiCodes implements IBaseCode {
      */
     DATA_DUPLICATION ("DataDuplication", "{}数据已经存在{}"),
     
-    DATA_NOT_FOUND ("DataDuplication", "{}数据不存在{}"),
+    DATA_NOT_FOUND ("DataNotFound", "{}数据不存在{}"),
 
     
     NO_LOGIN_USER ("noLoginUser", "登录用户不存在！"),
@@ -89,8 +90,19 @@ public enum GlobalApiCodes implements IBaseCode {
     /**
      * 数据已被他人更新（乐观锁）
      */
-    DATA_VERSION_OLD("DataVersionOld", "数据已被更新，请刷新页面重新编辑保存");
-	
+    DATA_VERSION_OLD("DataVersionOld", "数据已被更新，请刷新页面重新编辑保存"),
+
+    FILE_PATH_NOT_FOUND_ERROR("FileNotFoundError", "附件不存在！, 附件地址为【{}】"),
+    
+    /**
+     * 脚本执行日志目前是依赖异常日志输出并查看，所以声明一个异常标识
+     */
+    SCRIPT_LOG("ScriptLog", "{}"),
+
+    /**
+     * XSS字段检查
+     */
+    XSS_INJECT("XssInject", "存在Xss注入风险，请修改字段值：{}");
 
     private final String code;
 

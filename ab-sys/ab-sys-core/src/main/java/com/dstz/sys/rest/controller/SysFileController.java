@@ -1,6 +1,7 @@
 package com.dstz.sys.rest.controller;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.io.FileUtil;
@@ -10,27 +11,28 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
 import com.dstz.base.api.vo.ApiResponse;
 import com.dstz.base.common.constats.AbAppRestConstant;
 import com.dstz.base.common.constats.StrPool;
 import com.dstz.base.common.exceptions.BusinessMessage;
+import com.dstz.base.common.property.PropertyEnum;
+import com.dstz.base.common.utils.AESUtil;
 import com.dstz.base.common.utils.AbRequestUtils;
-import com.dstz.base.common.utils.JsonUtils;
+import com.dstz.base.common.utils.UserContextUtils;
 import com.dstz.base.web.controller.AbCrudController;
 import com.dstz.sys.api.constant.SysApiCodes;
+import com.dstz.sys.api.dto.SysFileDownloadDto;
 import com.dstz.sys.core.entity.SysFile;
 import com.dstz.sys.core.manager.SysFileManager;
-import com.dstz.sys.rest.model.dto.OnlineDocParam;
-import com.dstz.sys.rest.model.dto.OnlineDocParamDTO;
 import com.dstz.sys.rest.model.dto.OperateOnlineDocDTO;
 import com.dstz.sys.rest.model.dto.UpdateFileDTO;
 import com.dstz.sys.rest.model.vo.CreateAndOpenVO;
-import com.dstz.sys.rest.model.vo.OnlineDocApiVO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,16 +65,14 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping(AbAppRestConstant.SYS_SERVICE_PREFIX + "/sysFile")
 public class SysFileController extends AbCrudController<SysFile> {
 
+    private Logger logger = LoggerFactory.getLogger(SysFileController.class);
+
     private static final Integer FILE_NAME_MAX_LENGTH = 60;
     //文件上传的默认字典分类
     private static final String DEFAULT_DIC_CODE = "mrfl";
 
-    private final SysFileManager sysFileManager;
-
-    public SysFileController(SysFileManager sysFileManager) {
-
-        this.sysFileManager = sysFileManager;
-    }
+    @Autowired
+    private  SysFileManager sysFileManager;
 
     /**
      * <pre>
@@ -122,18 +122,24 @@ public class SysFileController extends AbCrudController<SysFile> {
      * <pre>
      * </pre>
      *
-     * @param fileId 文件名
+     * @param fileDto 文件id 和 token加密文件id后的密匙
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "download")
-    public void download(@RequestParam("fileId") String fileId, HttpServletResponse response) throws Exception {
-        SysFile sysFile = sysFileManager.getById(fileId);
+    @PostMapping(value = "download")
+    public void download(@RequestBody @Valid SysFileDownloadDto fileDto, HttpServletResponse response) throws Exception {
+        String userId = UserContextUtils.getUserId();
+        //加密的key要求了必须是16 24 32位，否则会抛异常，因此前后端统一取token的前16位
+        String key = AESUtil.encryptKey(fileDto.getId(), userId.substring(0, 16));
+        if (!StrUtil.equals(key, fileDto.getKey())) {
+            return;
+        }
+        SysFile sysFile = sysFileManager.getById(fileDto.getId());
         if (Objects.isNull(sysFile)) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        InputStream inputStream = sysFileManager.download(fileId);
+        InputStream inputStream = sysFileManager.download(fileDto.getId());
         if (inputStream == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
         }
@@ -192,7 +198,7 @@ public class SysFileController extends AbCrudController<SysFile> {
     }
 
     @RequestMapping(value = "update")
-    public ApiResponse update(HttpServletRequest request, HttpServletResponse response) throws Exception  {
+    public ApiResponse update(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String fileId = request.getParameter("fileId");
         String userId = request.getParameter("userId");
         Part file = request.getPart("file");
@@ -205,48 +211,34 @@ public class SysFileController extends AbCrudController<SysFile> {
         updateFileDTO.setUserId(userId);
         int result = sysFileManager.update(updateFileDTO);
 
-        return ApiResponse.success(result).withMessage("更新成功"+result+"条");
+        return ApiResponse.success(result).withMessage("更新成功" + result + "条");
     }
 
     @Override
     protected String getEntityDesc() {
         return "系统附件";
     }
+ 
 
-    @RequestMapping(value = "open")
-    public ApiResponse openFile(@RequestBody @Valid OperateOnlineDocDTO operateDTO){
-        HttpServletRequest request = AbRequestUtils.getHttpServletRequest();
-        String requestUrl =StrUtil.removeSuffix(request.getRequestURL(),request.getServletPath());
+    private String getUrlPrefix(HttpServletRequest request) {
 
-        return ApiResponse.success(sysFileManager.openFile(operateDTO,requestUrl));
-    }
+        List<String> pathStrList = StrUtil.split(request.getServletPath(), StrPool.SLASH);
+        pathStrList.remove(pathStrList.size() - 1);
 
-    @RequestMapping(value = "close")
-    public ApiResponse closeFile(@RequestBody @Valid OperateOnlineDocDTO operateDTO){
-        return ApiResponse.success(sysFileManager.closeFile(operateDTO));
-    }
-
-
-    /**
-     * 创建并打开新文件
-     * @param operateDTO
-     * @return
-     * @throws IOException
-     */
-    @RequestMapping(value = "createAndOpen", method = RequestMethod.POST)
-    public ApiResponse<CreateAndOpenVO> createAndOpen(@RequestBody OperateOnlineDocDTO operateDTO) {
-        if (StrUtil.isEmpty(operateDTO.getFileName())){
-            operateDTO.setFileName("新建文件.docx");
+        String resultPath = CollUtil.join(pathStrList, StrPool.SLASH);
+        String apiAgentPrefix = StrUtil.trimToEmpty(PropertyEnum.API_NGINX_AGENT_PREFIX.getPropertyValue(String.class));
+        if (StrUtil.isNotEmpty(apiAgentPrefix)) {
+            resultPath = apiAgentPrefix + resultPath;
         }
-        //新建文件
-        SysFile sysFile = sysFileManager.upload( IoUtil.toUtf8Stream(""), operateDTO.getFileName(), DEFAULT_DIC_CODE);
-        //打开文件
-        if (sysFile !=null && StrUtil.isNotEmpty(sysFile.getId())){
-            operateDTO.setFileId(sysFile.getId());
-            HttpServletRequest request = AbRequestUtils.getHttpServletRequest();
-            String requestUrl =StrUtil.removeSuffix(request.getRequestURL(),request.getServletPath());
-            return ApiResponse.success(new CreateAndOpenVO(sysFileManager.openFile(operateDTO,requestUrl),sysFile.getId()));
+
+        if (logger.isDebugEnabled()){
+            logger.debug("OnlineDocService :  requestUrl :  {}", request.getRequestURL());
+            logger.debug("OnlineDocService :  path :  {}", resultPath);
+            logger.debug("OnlineDocService :  url :  {}", StrUtil.removeSuffix(request.getRequestURL(), request.getServletPath()) + resultPath);
         }
-        return ApiResponse.fail(SysApiCodes.FILE_CREATE_FILE_ERROR.getCode(),SysApiCodes.FILE_CREATE_FILE_ERROR.getMessage());
+
+        return StrUtil.removeSuffix(request.getRequestURL(), request.getServletPath()) + resultPath;
     }
+
+
 }

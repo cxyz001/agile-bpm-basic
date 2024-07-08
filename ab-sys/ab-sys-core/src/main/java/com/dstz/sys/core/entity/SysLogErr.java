@@ -30,6 +30,12 @@ public class SysLogErr extends AbModel<SysLogErr> {
     private String account;
 
     /**
+     * 帐号
+     */
+    @TableField("full_name_")
+    private String fullName;
+
+    /**
      * IP来源
      */
     @TableField("ip_")
@@ -178,5 +184,13 @@ public class SysLogErr extends AbModel<SysLogErr> {
     @Override
     public Serializable pkVal() {
         return this.id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

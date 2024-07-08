@@ -5,6 +5,7 @@ import com.dstz.base.common.utils.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.annotation.Transient;
+import org.springframework.util.MultiValueMap;
 
 import java.util.Date;
 import java.util.Map;
@@ -38,6 +39,11 @@ public class AbRequestLog implements java.io.Serializable {
      * 操作用户名
      */
     private String username;
+
+    /**
+     * 操作用户名
+     */
+    private String fullName;
 
     /**
      * 操作部门名称
@@ -77,7 +83,7 @@ public class AbRequestLog implements java.io.Serializable {
     /**
      * 请求头
      */
-    private Map<String, String> requestHeaderMap;
+    private MultiValueMap<String, String> requestHeaderMap;
 
     /**
      * 请求参数
@@ -116,6 +122,11 @@ public class AbRequestLog implements java.io.Serializable {
     @Transient
     private Map<Object, Object> attributeMap;
 
+    /**
+     * cookie 中的 签名字段
+     */
+    private String signature;
+
     public String getTraceId() {
         return traceId;
     }
@@ -126,6 +137,10 @@ public class AbRequestLog implements java.io.Serializable {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public String getGroupName() {
@@ -156,7 +171,7 @@ public class AbRequestLog implements java.io.Serializable {
         return requestTime;
     }
 
-    public Map<String, String> getRequestHeaderMap() {
+    public MultiValueMap<String, String> getRequestHeaderMap() {
         return requestHeaderMap;
     }
 
@@ -182,6 +197,10 @@ public class AbRequestLog implements java.io.Serializable {
 
     public Throwable getException() {
         return exception;
+    }
+
+    public String getSignature() {
+        return signature;
     }
 
     /**
@@ -244,6 +263,11 @@ public class AbRequestLog implements java.io.Serializable {
             return this;
         }
 
+        public Builder withFullName(String fullName) {
+            this.abRequestLog.fullName = fullName;
+            return this;
+        }
+
         public Builder withGroupId(String groupId) {
             this.abRequestLog.groupId = groupId;
             return this;
@@ -280,7 +304,7 @@ public class AbRequestLog implements java.io.Serializable {
             return this;
         }
 
-        public Builder withRequestHeaderMap(Map<String, String> requestHeaderMap) {
+        public Builder withRequestHeaderMap(MultiValueMap<String, String> requestHeaderMap) {
             this.abRequestLog.requestHeaderMap = requestHeaderMap;
             return this;
         }
@@ -312,6 +336,10 @@ public class AbRequestLog implements java.io.Serializable {
 
         public Builder withException(Throwable throwable) {
             this.abRequestLog.exception = throwable;
+            return this;
+        }
+        public Builder withSignature(String signature) {
+            this.abRequestLog.signature = signature;
             return this;
         }
 

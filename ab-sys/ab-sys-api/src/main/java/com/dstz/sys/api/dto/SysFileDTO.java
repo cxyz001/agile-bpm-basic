@@ -17,6 +17,11 @@ public class SysFileDTO implements Serializable {
      * 附件名
      */
     private String name;
+
+    /**
+     * 附件大小
+     */
+    private Long size;
     /**
      * <pre>
      * 这附件用的是上传器
@@ -62,5 +67,13 @@ public class SysFileDTO implements Serializable {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
     }
 }

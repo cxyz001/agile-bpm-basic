@@ -78,6 +78,14 @@ public class MessageTemplate extends AbModel<MessageTemplate> {
     @TableField("template_param_")
     private String templateParam;
 
+
+    /**
+     * 短信供应商模板code
+     */
+    @TableField("sms_template_code_")
+    private String smsTemplateCode;
+
+
     /**
      * 是否启用
      */
@@ -125,6 +133,15 @@ public class MessageTemplate extends AbModel<MessageTemplate> {
      */
     @TableField(value = "update_by_", fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
+
+
+    public String getSmsTemplateCode() {
+        return smsTemplateCode;
+    }
+
+    public void setSmsTemplateCode(String smsTemplateCode) {
+        this.smsTemplateCode = smsTemplateCode;
+    }
 
     @Override
     public String getId() {

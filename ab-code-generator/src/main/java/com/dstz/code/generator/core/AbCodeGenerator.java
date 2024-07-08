@@ -86,7 +86,7 @@ public class AbCodeGenerator {
 
 		private void moveMapperXml(Map<OutputFile, String> pathInfo) {
 			final String searchStr = StrUtil.join(File.separator, "src", "main", "java");
-			String mapperXmlPath = pathInfo.get(OutputFile.mapperXml);
+			String mapperXmlPath = pathInfo.get(OutputFile.xml);
 			int index = mapperXmlPath.lastIndexOf(searchStr);
 			File mapperXmlResourceDir = new File(mapperXmlPath.substring(0, index) + searchStr.replace("java", "resources") + mapperXmlPath.substring(index + searchStr.length()));
 			if (!mapperXmlResourceDir.exists()) {

@@ -1,5 +1,6 @@
 import cn.hutool.core.util.StrUtil;
 import com.dstz.base.enums.AbDbType;
+import com.dstz.base.utils.AbDataSourceUtils;
 
 /**
  * 给 mybatis mapper 扩展 工具类。
@@ -26,7 +27,7 @@ public class Ognl {
      * @return
      */
     public static boolean isSqlServer() {
-        return AbDbType.SQLSERVER.equals("");
+        return AbDbType.SQLSERVER.equals(AbDataSourceUtils.getCurrentDataSource().getDbType());
     }
 
     /**
@@ -35,7 +36,7 @@ public class Ognl {
      * @return
      */
     public static boolean isPostgreSql() {
-        return AbDbType.POSTGRESQL.equals("");
+        return AbDbType.POSTGRESQL.equals(AbDataSourceUtils.getCurrentDataSource().getDbType());
     }
     
     public static String $aaaaaaa$(){

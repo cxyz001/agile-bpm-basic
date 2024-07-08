@@ -12,6 +12,7 @@ public enum SysApiCodes implements IBaseCode {
 
     KEY_WORD_DUPLICATE("CodeDuplicate", "{}系统中已存在!"),
     CODE_DUPLICATE("CodeDuplicate", "编码已存在!"),
+    CODE_DUPLICATE_CODE("CodeDuplicateCode", "编码已存在! {}"),
     NAME_DUPLICATE("NameDuplicate", "名称已存在!"),
 
 
@@ -29,7 +30,7 @@ public enum SysApiCodes implements IBaseCode {
     WORK_CALENDAR_SYSTEM_ERROR("WorkCalendarSystemError", "系统与类型不一致"),
     WORK_CALENDAR_CANT_NOT_CREATE("WorkCalendarCantNotCreate", "不支持创建"),
     WORK_CALENDAR_CANT_NOT_UPDATE("WorkCalendarCantNotUpdate", "不支持更新"),
-    WORK_CALENDAR_YEAR_NOT_INITIAL("WorkCalendarYearNotInitial", "年份未初始化"),
+    WORK_CALENDAR_YEAR_NOT_INITIAL("WorkCalendarYearNotInitial", "获取工作日失败：请维护{}年法定节假日"),
     HOLIDAY_CONF_NAME_DUPLICATE("HolidayConfNameDuplicate", "重复添加,相同日期内只能有一个同名节假日"),
     HOLIDAY_CONF_NOT_FOUND("HolidayConfNotFound", "节假日配置不存在"),
     WORKCALENDAR_NOT_INIT("sys-workCalendar-not-init","工作日计算不可用，请配置 {} 年节假日!"),
@@ -52,7 +53,8 @@ public enum SysApiCodes implements IBaseCode {
     FILE_NAME_LENGTH_ERROR("FileNameLengthError", "文件名字长度不能大于60字符"),
     FILE_CREATE_DIR_ERROR("CanNotCreateDirectory","创建目录失败{}"),
     FILE_OPEN_FILE_ERROR("OpenFileError","打开在线文档失败，【{}】"),
-    FILE_CREATE_FILE_ERROR("createFileError","创建文档失败！"),
+    FILE_CREATE_FILE_ERROR("CreateFileError","创建文档失败！"),
+    FILE_TEMPLATE_ERROR("FileTemplateError","文件模板错误！【{}】"),
 
     //审计日志相关
     OPERATE_LOG_REMOVE_ERROR("OperateLogRemoveError", "尚有操作日志[{}]条关联，请先删除操作日志再操作"),
@@ -73,6 +75,19 @@ public enum SysApiCodes implements IBaseCode {
     KEY_REPEAT("keyRepeat", "别名[{}]与已有别名[{}]路径冲突"),
 
     CONNECT_RECORD_ERROR("ConnectRecordError", "信息:{}"),
+
+    SYS_CONFIG_NOT_FOUND("sys_config_not_found", "系统配置未找到,code:{}"),
+
+
+    /**
+     * 临时链接相关
+     */
+    TEMPORARY_LINK_ENABLED("TemporaryLinkEnabled","临时链接不可用！{}"),
+
+    TEMPORARY_LINK_NOT_FOUND("TemporaryLinkNotFound","临时链接不存在！"),
+
+
+    SYSCONFIG_CODE_ISUPDATA("sysconfig_code_isupdata", "系统配置编码不允许修改：{}"),
     ;
     /**
      * 数据源连接异常

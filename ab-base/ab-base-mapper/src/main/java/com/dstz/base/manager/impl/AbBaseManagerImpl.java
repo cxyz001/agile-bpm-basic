@@ -1,6 +1,5 @@
 package com.dstz.base.manager.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -15,6 +14,8 @@ import com.dstz.base.entity.IPersistentEntity;
 import com.dstz.base.manager.AbBaseManager;
 import com.dstz.base.mapper.AbBaseMapper;
 import com.dstz.base.query.AbQueryFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -30,6 +31,8 @@ import java.util.List;
  * @since 2022-01-24
  */
 public abstract class AbBaseManagerImpl<T extends IPersistentEntity> implements AbBaseManager<T> {
+
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private AbBaseMapper<T> abBaseMapper;
@@ -148,36 +151,30 @@ public abstract class AbBaseManagerImpl<T extends IPersistentEntity> implements 
 
     @Override
     public void bulkCreate(Iterable<T> iterable, int size) {
-        // 能被hutool拆分列表
         if (iterable instanceof List) {
-            List<T> list = CastUtils.cast(iterable);
-            if (list.size() <= size) {
-                getBaseMapper().bulkCreate(iterable);
-            } else {
-                ListUtil.split(list, size).forEach(getBaseMapper()::bulkCreate);
-            }
+            ListUtil.<T>partition(CastUtils.cast(iterable), size).forEach(getBaseMapper()::bulkCreate);
         } else {
-            List<T> bulkList = new ArrayList<>(size);
-            for (T item : iterable) {
-                bulkList.add(item);
-                if (bulkList.size() >= size) {
-                    getBaseMapper().bulkCreate(bulkList);
-                    bulkList.clear();
+            List<T> batchList = new ArrayList<>(size);
+            for (T entity : iterable) {
+                batchList.add(entity);
+                if (batchList.size() == size) {
+                    getBaseMapper().bulkCreate(batchList);
+                    batchList.clear();
                 }
             }
-            if(CollUtil.isNotEmpty(bulkList)) {
-                getBaseMapper().bulkCreate(bulkList);
+            if (!batchList.isEmpty()) {
+                getBaseMapper().bulkCreate(batchList);
             }
         }
     }
-
+    
     @Override
     public T getByCode(String code) {
         QueryWrapper<T> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("code_", code);
         return this.selectOne(queryWrapper);
     }
-
+    
     @Override
     public boolean checkCode(T entity, String code) {
         T t = getByCode(code);

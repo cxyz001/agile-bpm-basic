@@ -7,7 +7,6 @@ import com.dstz.sys.api.dto.SysConnectRecordDTO;
 import com.dstz.sys.api.vo.SysConnectRecordVO;
 import com.dstz.sys.core.entity.SysConnectRecord;
 import com.dstz.sys.core.manager.SysConnectRecordManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,6 +34,13 @@ public class SysConnectRecordApiImpl implements SysConnectRecordApi {
     @Override
     public List<SysConnectRecordVO> getByTargetId(String id, String type) {
         List<SysConnectRecord> list = connectRecordManager.getByTargetId(id, type);
+        return BeanCopierUtils.transformList(list, SysConnectRecordVO.class);
+    }
+
+
+    @Override
+    public List<SysConnectRecordVO> getBySourceId(List<String> sourceIds, String type) {
+        List<SysConnectRecord> list = connectRecordManager.getBySourceId(sourceIds, type);
         return BeanCopierUtils.transformList(list, SysConnectRecordVO.class);
     }
 

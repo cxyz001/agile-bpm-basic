@@ -28,6 +28,10 @@ public class AbCacheRegionConstant {
     public static final String SYS_RESOURCE = "SYS_RESOURCE";
 
     /**
+     * 系统资源所有资源url
+     */
+    public static final String SYS_RESOURCE_ALLURL = "SYS_RESOURCE_ALLURL";
+    /**
      * 工作交接相关
      */
     public static final String WORK_HANDOVER_REGION = "WORK_HANDOVER";
@@ -57,6 +61,8 @@ public class AbCacheRegionConstant {
      * 第三方登录token
      */
     public static final String THIRD_TOKEN = "THIRD_TOKEN";
+
+
     /**
      * agileBPM 流程定义
      */
@@ -91,4 +97,19 @@ public class AbCacheRegionConstant {
      *
      */
     public static final String OAUTH_REGION = "";
+
+
+    public static final String SALARY_CALCULATE = "SALARY_CALCULATE";
+
+    /**
+     *用户注册相关
+     */
+    public static final String USER_REGISTER_REGION = "USER_REGISTER";
+
+    public static final String APPSTORE_TRAIL_INFO = "APPSTORE_TRAIL_INFO";
+
+    /**
+     * 短信验证码
+     */
+    public static final String VERIFICATION_CODE = "VERIFICATION_CODE";
 }

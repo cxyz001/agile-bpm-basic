@@ -6,6 +6,8 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jinxia.hou
@@ -14,6 +16,8 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
  * @date 2022/2/1415:15
  */
 public class HanYuPinyinUtil {
+
+    protected static final Logger logger = LoggerFactory.getLogger(HanYuPinyinUtil.class);
 
     /**
      * 将文字转为汉语拼音
@@ -36,7 +40,7 @@ public class HanYuPinyinUtil {
                 }
             }
         } catch (BadHanyuPinyinOutputFormatCombination e) {
-            System.out.println("字符不能转成汉语拼音");
+            logger.warn("ChineseLanguage:{} 字符不能转成汉语拼音, {}", ChineseLanguage, e.getMessage());
         }
         return hanyupinyin;
     }
@@ -69,7 +73,7 @@ public class HanYuPinyinUtil {
                 }
             }
         } catch (BadHanyuPinyinOutputFormatCombination e) {
-            System.out.println("字符不能转成汉语拼音");
+            logger.warn("ChineseLanguage:{} 字符不能转成汉语拼音, {}", ChineseLanguage, e.getMessage());
         }
         return hanyupinyin;
     }
@@ -95,7 +99,7 @@ public class HanYuPinyinUtil {
                 }
             }
         } catch (BadHanyuPinyinOutputFormatCombination e) {
-            System.out.println("字符不能转成汉语拼音");
+            logger.warn("ChineseLanguage:{} 字符不能转成汉语拼音, {}", ChineseLanguage, e.getMessage());
         }
         return hanyupinyin;
     }
@@ -129,7 +133,7 @@ public class HanYuPinyinUtil {
 
             }
         } catch (BadHanyuPinyinOutputFormatCombination e) {
-            System.out.println("字符不能转成汉语拼音");
+            logger.warn("ChineseLanguage:{} 字符不能转成汉语拼音, {}", ChineseLanguage, e.getMessage());
         }
         return hanyupinyin;
     }

@@ -1,5 +1,7 @@
 package com.dstz.component.mq.engine.config;
 
+import com.dstz.component.mq.engine.producer.AsyncJmsProducer;
+
 /**
  * 消息队列类型
  *
@@ -22,26 +24,27 @@ public enum AbMessageQueueType {
      */
     SYNCHRONOUS(AbSynchronousMessageQueueConfiguration.class),
 
-    /**
-     * 事务消息
-     */
-   // TRANSACTION_MESSAGE(TxmMessageQueueConfiguration.class),
 
     /**
      * 丢弃消息
      */
-    DISCARD(DiscardMessageQueueConfiguration.class);
+    DISCARD(DiscardMessageQueueConfiguration.class),
+
+    /**
+     * 异步处理
+     */
+    ASYNC(AsyncJmsProducer.class);
 
     /**
      * 配置类
      */
-    private Class configurationClass;
+    private Class<?> configurationClass;
 
-    AbMessageQueueType(Class configurationClass) {
+    AbMessageQueueType(Class<?> configurationClass) {
         this.configurationClass = configurationClass;
     }
 
-    public Class getConfigurationClass() {
+    public Class<?> getConfigurationClass() {
         return configurationClass;
     }
 }

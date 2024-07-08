@@ -1,9 +1,9 @@
- 
 /target/
 /.classpath
 /.project
-/.settings/ 
+.settings/ 
 target/
+bin/
+
 *.classpath
 *.project
-*.class

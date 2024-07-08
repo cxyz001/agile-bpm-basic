@@ -1,8 +1,11 @@
 package com.dstz.sys.rest.model.dto;
 
 
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
+
+import javax.validation.constraints.NotEmpty;
+
+import cn.hutool.core.collection.ListUtil;
 
 /**
  * 自动翻译
@@ -24,6 +27,16 @@ public class AutoTranslateDTO implements java.io.Serializable {
 	 */
 	@NotEmpty(message = "翻译目标语言不能为空")
 	private List<String> toLanguages;
+	
+	public AutoTranslateDTO() {
+		
+	}
+	
+	public AutoTranslateDTO(String chineseText, String... toLanguages) {
+		super();
+		this.chineseText = chineseText;
+		this.toLanguages = ListUtil.toLinkedList(toLanguages);
+	}
 
 	public String getChineseText() {
 		return chineseText;

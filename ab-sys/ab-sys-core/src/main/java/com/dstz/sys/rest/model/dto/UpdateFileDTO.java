@@ -1,7 +1,5 @@
 package com.dstz.sys.rest.model.dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -16,6 +14,14 @@ public class UpdateFileDTO implements Serializable {
     private String userId;
     private String userName;
     private InputStream fileStream;
+
+    public UpdateFileDTO(String fileId, InputStream fileStream) {
+        this.fileId = fileId;
+        this.fileStream = fileStream;
+    }
+
+    public UpdateFileDTO() {
+    }
 
     public String getFileId() {
         return fileId;

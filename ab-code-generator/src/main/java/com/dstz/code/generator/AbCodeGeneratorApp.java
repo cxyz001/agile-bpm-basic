@@ -15,7 +15,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @EnableConfigurationProperties(AbCodeGeneratorProperties.class)
 @SpringBootApplication(exclude = MybatisPlusAutoConfiguration.class)
-public class AbCodeGeneratorApp {
+public class
+AbCodeGeneratorApp {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(AbCodeGeneratorApp.class, args);

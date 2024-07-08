@@ -2,7 +2,6 @@ package com.dstz.sys.rest.controller;
 
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import com.dstz.base.api.dto.QueryParamDTO;
@@ -16,11 +15,10 @@ import com.dstz.base.query.AbQueryFilter;
 import com.dstz.base.query.impl.DefaultAbQueryFilter;
 import com.dstz.base.web.controller.AbCrudController;
 import com.dstz.sys.api.constant.SysCackeKeyConstant;
-import com.dstz.sys.api.dto.DataDictDTO;
+import com.dstz.sys.api.vo.SysDataDictVO;
 import com.dstz.sys.core.entity.SysDataDict;
 import com.dstz.sys.core.manager.SysDataDictManager;
 import com.dstz.sys.rest.model.dto.GetDictDTO;
-import com.dstz.sys.rest.model.vo.SysDataDictVO;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +46,6 @@ public class
 SysDataDictController extends AbCrudController<SysDataDict> {
 
     private final SysDataDictManager sysDataDictManager;
-
     private final ICache iCache;
 
     public SysDataDictController(SysDataDictManager sysDataDictManager, ICache iCache) {
@@ -72,7 +71,6 @@ SysDataDictController extends AbCrudController<SysDataDict> {
     @RequestMapping("getDictData")
     public ApiResponse<List<SysDataDictVO>> getByDictKey(@RequestBody @Valid GetDictDTO getDictDTO) {
         List<SysDataDictVO> nodeVoList = BeanCopierUtils.transformList(sysDataDictManager.getDictNodeList(getDictDTO.getDictKey(), getDictDTO.getHasRoot()), SysDataDictVO.class);
-
         //如果包含字典本身，则把字典名称做为字典项树的根节点
         if (CollUtil.isEmpty(nodeVoList) || getDictDTO.getHasRoot()) {
             return ApiResponse.success(BeanConversionUtils.listToTree(nodeVoList));
@@ -137,16 +135,8 @@ SysDataDictController extends AbCrudController<SysDataDict> {
             sysDataDictManager.create(entity);
         }
         //把字典项放到缓存中
-        putDictNodeInCache(entity.getDictKey());
+        sysDataDictManager.updateCache(CollUtil.newHashSet(entity.getDictKey()));
         return ApiResponse.success(entity.getId()).withMessage(String.format(desc, getEntityDesc()));
-    }
-
-    private void putDictNodeInCache(String dictKey) {
-        List<SysDataDict> dictNodeList = sysDataDictManager.getDictNodeList(dictKey, false);
-        if (CollUtil.isNotEmpty(dictNodeList)) {
-            List<DataDictDTO> data = BeanCopierUtils.transformList(dictNodeList, DataDictDTO.class);
-            iCache.put(AbCacheRegionConstant.DICT_CACHE_REGION, SysCackeKeyConstant.GET_DICT_NODE_LIST + dictKey, data);
-        }
     }
 
 
@@ -158,7 +148,7 @@ SysDataDictController extends AbCrudController<SysDataDict> {
      */
     @RequestMapping(value = "saveBatch", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse saveBatch(@Valid @RequestBody List<SysDataDict> entityList) {
-        entityList.forEach(entity->{
+        entityList.forEach(entity -> {
             if (StringUtils.hasLength(entity.getId())) {
                 sysDataDictManager.update(entity);
             } else {
@@ -166,11 +156,9 @@ SysDataDictController extends AbCrudController<SysDataDict> {
             }
         });
         //把字典项放到缓存中
-        if (CollUtil.isNotEmpty(entityList)){
-            Set<String> dictKeys= entityList.stream().map(SysDataDict::getDictKey).collect(Collectors.toSet());
-            dictKeys.forEach(dictKey->{
-                putDictNodeInCache(dictKey);
-            });
+        if (CollUtil.isNotEmpty(entityList)) {
+            Set<String> dictKeys = entityList.stream().map(SysDataDict::getDictKey).collect(Collectors.toSet());
+            sysDataDictManager.updateCache(dictKeys);
         }
         return ApiResponse.success().withMessage("批量操作成功");
     }

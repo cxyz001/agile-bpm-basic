@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import com.dstz.base.api.model.Tree;
 import com.dstz.base.common.utils.CastUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,5 +81,13 @@ public class MapTree extends HashMap<String, Object> implements Tree<MapTree> {
 	@Override
 	public void setChildren(List<MapTree> list) {
 		put(treeNodeConfig.getChildrenKey(), list);
+	}
+
+	public void addChild(MapTree child) {
+		List<MapTree> children = getChildren();
+		if (children == null) {
+			setChildren(children = new ArrayList<>());
+		}
+		children.add(child);
 	}
 }

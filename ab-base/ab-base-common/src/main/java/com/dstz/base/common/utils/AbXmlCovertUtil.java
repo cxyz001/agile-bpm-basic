@@ -1,13 +1,17 @@
 package com.dstz.base.common.utils;
 
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import javax.xml.transform.sax.SAXSource;
+import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 
 /**
  * @author jinxia.hou
@@ -19,13 +23,18 @@ public class AbXmlCovertUtil {
     /**
      * XML转换为POJO类型
      */
-    @SafeVarargs
-    public static <T> T covert2Object(String xml,Class<? extends Object>... classes) throws JAXBException, UnsupportedEncodingException {
+    public static <T> T covert2Object(String xml, Class<?>... classes) throws JAXBException, SAXException {
         JAXBContext jAXBContext = JAXBContext.newInstance(classes);
 
+        // 创建XMLReader并禁用外部实体
+        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        // 返回空字符串阻止实体解析
+        xmlReader.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
+
+        SAXSource saxSource = new SAXSource(xmlReader, new InputSource(new StringReader(xml)));
+
         Unmarshaller unmarshaller = jAXBContext.createUnmarshaller();
-        InputStream is = new ByteArrayInputStream(xml.getBytes("utf-8"));
-        return (T)unmarshaller.unmarshal(is);
+        return CastUtils.cast(unmarshaller.unmarshal(saxSource));
     }
 
     /**

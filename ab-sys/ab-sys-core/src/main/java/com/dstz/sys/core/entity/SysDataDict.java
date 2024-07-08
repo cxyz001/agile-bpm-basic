@@ -66,6 +66,12 @@ public class SysDataDict extends AbModel<SysDataDict> {
     private String typeCode;
 
     /**
+     * 是否禁用（0:正常  1:禁用）
+     */
+    @TableField("disable_")
+    private Integer disable = 0;
+
+    /**
      * 排序
      */
     @TableField("sn_")
@@ -179,6 +185,14 @@ public class SysDataDict extends AbModel<SysDataDict> {
 
     public void setTypeCode(String typeCode) {
         this.typeCode = typeCode;
+    }
+
+    public Integer getDisable() {
+        return disable;
+    }
+
+    public void setDisable(Integer disable) {
+        this.disable = disable;
     }
 
     public Integer getSn() {

@@ -3,10 +3,10 @@
 ## 敏捷开发平台
 
 全新开源的 vue3 TS 的前后台分离的开发平台
- 
+
 前端基于 `Vue3` 组合式API, `TypeScript`, `Element-plus`,`Pinia`,`Axios`,支持三种布局, 自定义主题风格
 后端基于 `AgileBPM` 流程表单,`SpringBoot `,`MybatisPlus` ,`Activiti7` ,`Jackson` , `JDK17` ,`Hutool`  等主流技术栈
-
+ 
 后端是 Maven模块化管理的SOA的 SpringBoot 单体架构，模块间低耦合，可选择模块组合成微服务架构。
 
 项目预览地址：[预览](http://demoa5.tongzhouyun.com/index)
@@ -15,15 +15,9 @@
 
 文档地址：[文档](http://www.agilebpm.cn/)
 
-# 技术交流群
-
-q群3：108698205，如果进了技术群，请先看群公告再问问题，不方便QQ的可添加微信 agileBPM01 ，他会拉进微信群
-
-
 ## 起步
 
 1. 下载 `agile-bpm-basic`项目,以 maven 项目引入工程 并 根目录下 执行 `mvn clean install -DskipTests`
-(请注意，请使用默认setting配置，否则无法下载 一些第三方特殊包)
 
 2. 执行数据库脚本创建数据库 `/doc/sql/mysql/full/agilebpm_full.sql`
 
@@ -60,11 +54,6 @@ q群3：108698205，如果进了技术群，请先看群公告再问问题，不
 
 ## 系统界面预览
 
-![项目预览](doc/tushi/1.png)
-![项目预览](doc/tushi/2.png)
-![项目预览](doc/tushi/3.png)
-![项目预览](doc/tushi/4.png)
-![项目预览](doc/tushi/5.png)
 
 
 ## 开发计划
