@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.dstz.sys.api.vo.WorkCalendarVO;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateUtil;
+
 /**
  * @author jinxia.hou
  * @Name WorkCalendarApiImpl
@@ -18,8 +21,7 @@ public class WorkCalendarApiImpl implements WorkCalendarApi {
 
 	@Override
 	public WorkCalendarVO getWorkCalendarByDay(Date day) {
-		// TODO Auto-generated method stub
-		return null;
+		return  null;
 	}
 
 	@Override
@@ -42,20 +44,17 @@ public class WorkCalendarApiImpl implements WorkCalendarApi {
 
 	@Override
 	public Date getEndWorkDay(Date startDay, int days) {
-		// TODO Auto-generated method stub
-		return null;
+		return DateUtil.offset(startDay, DateField.HOUR, days*24);
 	}
 
 	@Override
 	public Date getEndWorkDay(Date startDay, int days, String system) {
-		// TODO Auto-generated method stub
-		return null;
+		return DateUtil.offset(startDay, DateField.HOUR, days*24);
 	}
 
 	@Override
 	public Date getEndWorkDayByMinute(Date startDay, int minute) {
-		// TODO Auto-generated method stub
-		return null;
+		return DateUtil.offset(startDay, DateField.MINUTE, minute);
 	}
 
      
