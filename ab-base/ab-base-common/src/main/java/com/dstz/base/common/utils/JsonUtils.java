@@ -1,28 +1,22 @@
 package com.dstz.base.common.utils;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.util.ReflectionUtils;
-
+import cn.hutool.core.text.replacer.LookupReplacer;
+import cn.hutool.core.util.StrUtil;
 import com.dstz.base.common.enums.GlobalApiCodes;
 import com.dstz.base.common.exceptions.ApiException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.util.ReflectionUtils;
 
-import cn.hutool.core.util.StrUtil;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 
 /**
  * JSON 常用操作工具类
@@ -30,6 +24,12 @@ import cn.hutool.core.util.StrUtil;
  * @author wacxhs
  */
 public class JsonUtils {
+
+	private static final LookupReplacer ESCAPE_JSON = new LookupReplacer(new String[][]{
+			{"\"", "\\\""},
+			{"\\", "\\\\"},
+			{"/", "\\/"}
+	});
 
 	private static final ObjectMapper OBJECT_MAPPER;
 
@@ -317,4 +317,13 @@ public class JsonUtils {
 		return JsonUtils.parseObject(json, Map.class);
 	}
 
+	/**
+	 * 对JSON中出现的特殊字符串做转译
+	 *
+	 * @param str 字符串
+	 * @return 转译后字符串
+	 */
+	public static CharSequence escapeString(CharSequence str) {
+		return ESCAPE_JSON.replace(str);
+	}
 }

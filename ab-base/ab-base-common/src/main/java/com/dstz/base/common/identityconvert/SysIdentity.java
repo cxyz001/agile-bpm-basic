@@ -2,10 +2,12 @@ package com.dstz.base.common.identityconvert;
 
 import cn.hutool.core.util.StrUtil;
 import com.dstz.base.common.enums.IdentityType;
+import com.dstz.org.api.enums.GroupType;
 import com.dstz.org.api.model.IGroup;
 import com.dstz.org.api.model.IUser;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * 描述：流程与组织挂接实体接口 type : user / 其他group 类型
@@ -91,11 +93,24 @@ public class SysIdentity implements Serializable {
 	}
 
 	/**
+	 * 从参数创建SysIdentity实例
+	 *
+	 * @param id           id
+	 * @param name         名称
+	 * @param identityType 类型
+	 * @return 系统人员
+	 */
+	public static SysIdentity of(String id, String name, IdentityType identityType) {
+		return new SysIdentity(id, name, identityType.getKey());
+	}
+
+	/**
 	 * <pre>
 	 * 返回封装了type和name的显示用的信息
 	 * </pre>	
 	 * @return
 	 */
+	@Deprecated
 	public String getAssign() {
 		String str = "(";
 		if ("role".equals(type)) {
@@ -112,4 +127,31 @@ public class SysIdentity implements Serializable {
 		return str + ")" + name;
 	}
 
+	/**
+	 * 生成人员分配名称
+	 *
+	 * @return [人员类型]人员名称
+	 */
+	public String genAssignName() {
+		String typeDesc;
+		if (IdentityType.USER.getKey().equalsIgnoreCase(this.type)) {
+			typeDesc = IdentityType.USER.getValue();
+		} else {
+			typeDesc = Arrays.stream(GroupType.values())
+					.filter(ele -> ele.getType().equalsIgnoreCase(this.type))
+					.map(GroupType::getDesc)
+					.findFirst()
+					.orElse(StrUtil.EMPTY);
+		}
+		return String.format("[%s]%s", typeDesc, this.name);
+	}
+
+	/**
+	 * 生成人员分配信息
+	 *
+	 * @return 人员类型/人员名称/人员ID
+	 */
+	public String genAssignInfo() {
+		return String.format("%s/%s/%s", this.type, this.name, this.id);
+	}
 }

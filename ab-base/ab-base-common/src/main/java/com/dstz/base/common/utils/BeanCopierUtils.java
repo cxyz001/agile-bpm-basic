@@ -1,23 +1,18 @@
 package com.dstz.base.common.utils;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.aop.support.AopUtils;
-import org.springframework.cglib.beans.BeanCopier;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.cglib.beans.BeanCopier;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * bean 拷贝
@@ -39,7 +34,7 @@ public class BeanCopierUtils {
      * @param source 源对象
      * @param target 目标对象
      */
-    public static Object copyProperties(Object source, Object target) {
+    public static <T> T copyProperties(Object source, T target) {
         if (source != null && target != null) {
             getBeanCopier(ClassUtil.getClass(source), ClassUtil.getClass(target)).copy(source, target, null);
         }
@@ -114,13 +109,7 @@ public class BeanCopierUtils {
 
     private static BeanCopier getBeanCopier(Class<?> sourceClass, Class<?> targetClass) {
         final String beanKey = sourceClass.getName() + "->" + targetClass.getName();
-        return BEAN_COPIER_MAP.computeIfAbsent(beanKey, k -> {
-            AbBeanCopierGenerator generator = new AbBeanCopierGenerator();
-            generator.setSource(sourceClass);
-            generator.setTarget(targetClass);
-            generator.setUseConverter(false);
-            return generator.create();
-        });
+        return BEAN_COPIER_MAP.computeIfAbsent(beanKey, k -> new AbBeanCopierGenerator(sourceClass, targetClass).create());
     }
 
     /**
@@ -133,9 +122,11 @@ public class BeanCopierUtils {
      * </p>
      */
     private static class AbBeanCopierGenerator extends BeanCopier.Generator {
-        public AbBeanCopierGenerator() {
-            setContextClass(BeanCopier.class);
-            setNamePrefix(BeanCopier.class.getName());
+        public AbBeanCopierGenerator(Class<?> source, Class<?> target) {
+	        setSource(source);
+			setTarget(target);
+			setNamePrefix(target.getName());
+            setContextClass(target);
         }
     }
 }

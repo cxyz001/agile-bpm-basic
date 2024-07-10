@@ -10,15 +10,11 @@ import cn.hutool.core.lang.SimpleCache;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.stream.StreamUtil;
 import cn.hutool.core.thread.NamedThreadFactory;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import com.dstz.base.common.async.ContextCleanTaskDecorator;
 import com.dstz.base.common.async.ContextDuplicationTaskDecorator;
-import com.dstz.base.common.utils.TaskDecoratorUtils;
 import com.dstz.base.common.utils.CastUtils;
+import com.dstz.base.common.utils.TaskDecoratorUtils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -31,18 +27,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.function.SingletonSupplier;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -58,15 +49,19 @@ public class AbValueMapAnnotationProcessor {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbValueMapAnnotationProcessor.class);
 
+	private static final SingletonSupplier<AbValueMapAnnotationProcessor> INSTANCE_SUPPLIER = SingletonSupplier.of(AbValueMapAnnotationProcessor::new);
+
 	/**
 	 * 类注解字段缓存
 	 */
 	private final SimpleCache<Class<?>, List<BeanPropertyWriter>> classAnnotationFieldCache = new SimpleCache<>();
 
+	private final SimpleCache<Class<?>, Map<String, PropertyDescriptor>> classPropertyDesCache = new SimpleCache<>();
+
 	private volatile ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
 	public static AbValueMapAnnotationProcessor getInstance() {
-		return Holder.INSTANCE;
+		return INSTANCE_SUPPLIER.obtain();
 	}
 
 
@@ -212,26 +207,37 @@ public class AbValueMapAnnotationProcessor {
 		} else {
 			Class<?> mappedObjectClass = AopUtils.getTargetClass(mappedObject);
 			if (ArrayUtil.isEmpty(abValueMap.attrMap())) {
-				for (PropertyDescriptor propertyDescriptor : BeanUtil.getPropertyDescriptors(mappedObjectClass)) {
-					Method readMethod = propertyDescriptor.getReadMethod();
-					if (readMethod != null) {
-						gen.writeFieldName(fieldNamePrefix + StrUtil.upperFirst(propertyDescriptor.getName()));
-						gen.writeObject(ReflectUtil.invoke(mappedObject, readMethod));
-					}
+				for (PropertyDescriptor propertyDescriptor : getPropertyDescriptorMap(mappedObjectClass).values()) {
+					gen.writeFieldName(fieldNamePrefix + StrUtil.upperFirst(propertyDescriptor.getName()));
+					gen.writeObject(ReflectUtil.invoke(mappedObject, propertyDescriptor.getReadMethod()));
 				}
 			} else {
-				Map<String, PropertyDescriptor> propertyDescriptorMap = BeanUtil.getPropertyDescriptorMap(mappedObjectClass, false);
+				Map<String, PropertyDescriptor> propertyDescriptorMap = getPropertyDescriptorMap(mappedObjectClass);
 				for (AbValueMap.AttrMap attrMap : abValueMap.attrMap()) {
 					PropertyDescriptor propertyDescriptor = propertyDescriptorMap.get(attrMap.originName());
-					Method readMethod = propertyDescriptor != null ? propertyDescriptor.getReadMethod() : null;
-					if (readMethod != null) {
+					if (propertyDescriptor != null) {
 						gen.writeFieldName(StrUtil.isNotEmpty(attrMap.targetName()) ? attrMap.targetName() : fieldNamePrefix + StrUtil.upperFirst(attrMap.originName()));
-						gen.writeObject(ReflectUtil.invoke(mappedObject, readMethod));
+						gen.writeObject(ReflectUtil.invoke(mappedObject, propertyDescriptor.getReadMethod()));
 					}
 				}
 			}
 		}
 	}
+
+	private Map<String, PropertyDescriptor> getPropertyDescriptorMap(Class<?> clazz) {
+		return classPropertyDesCache.get(clazz, () -> {
+			Map<String, PropertyDescriptor> propertyDescriptorMap = BeanUtil.getPropertyDescriptorMap(clazz, false);
+			Map<String, PropertyDescriptor> filterPropertyDescriptorMap = MapUtil.newHashMap(propertyDescriptorMap.size());
+			propertyDescriptorMap.forEach((k, v) -> {
+				Method readMethod = v.getReadMethod();
+				if (readMethod != null && !Class.class.isAssignableFrom(readMethod.getReturnType())) {
+					filterPropertyDescriptorMap.put(k, v);
+				}
+			});
+			return filterPropertyDescriptorMap;
+		});
+	}
+
 
 	private Map<PropertyWriter, Collection<Object>> extractFieldGroupValues(Stream<?> stream, SerializerProvider serializerProvider) {
 		Map<PropertyWriter, Collection<Object>> fieldGroupValues = MapUtil.newConcurrentHashMap();
@@ -270,9 +276,4 @@ public class AbValueMapAnnotationProcessor {
 			return Collections.emptyList();
 		});
 	}
-
-	private interface Holder {
-		AbValueMapAnnotationProcessor INSTANCE = new AbValueMapAnnotationProcessor();
-	}
-
 }

@@ -1,8 +1,9 @@
 package com.dstz.base.common.enums;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.dstz.base.common.exceptions.BusinessException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Arrays;
@@ -65,14 +66,12 @@ public enum DataType {
 		return javaType;
 	}
 
-	public static Object parseValueByType(String dataType, String value) {
-		if (StrUtil.isBlank(value)) {
+	public static Object parseValueByType(String dataType, Object value) {
+		if (ObjectUtil.isEmpty(value)) {
 			return null;
 		}
-		return Arrays.stream(values()).filter(o -> o.getType().equals(dataType))
-		             .findFirst()
-		             .map(o -> Convert.convert(o.getJavaType(), value))
-		             .orElseThrow(() -> new BusinessException(GlobalApiCodes.PARAMETER_INVALID.formatDefaultMessage(value)));
+		Class<?> convertType = Arrays.stream(values()).filter(obj -> StrUtil.equalsIgnoreCase(obj.getType(), dataType)).findFirst().map(DataType::getJavaType).orElse(null);
+		Assert.notNull(convertType, () -> new IllegalArgumentException(String.format("无法转换为目标类型：%s", dataType)));
+		return Convert.convert(convertType, value);
 	}
-
 }

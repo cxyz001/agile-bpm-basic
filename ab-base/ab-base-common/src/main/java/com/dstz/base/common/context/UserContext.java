@@ -2,6 +2,7 @@ package com.dstz.base.common.context;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 import com.dstz.org.api.model.IGroup;
 import com.dstz.org.api.model.IUser;
@@ -79,4 +80,11 @@ public interface UserContext extends ContextDuplication {
      * 清理
      */
     void clear();
+
+    /**
+     * 过滤用户 工作交接相关
+     * @param userId
+     * @return
+     */
+    Set<String> getFilterUserIds(String userId);
 }

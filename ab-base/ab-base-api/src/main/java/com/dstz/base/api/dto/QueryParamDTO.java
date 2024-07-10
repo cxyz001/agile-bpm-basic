@@ -43,7 +43,11 @@ public class QueryParamDTO {
 	 * 是否启用分页
 	 */
 	private Boolean enablePage = true;
-	
+
+	/**
+	 * 是否忽略筛选条件 (剔除对话框自身配置好的条件,只筛选传入的参数条件)
+	 */
+	private Boolean ignoreCondition = false;
 	/**
 	 * bootrap 默认用的类型
 	 */
@@ -139,6 +143,15 @@ public class QueryParamDTO {
 		this.enablePage = enablePage;
 	}
 
+
+	public Boolean getIgnoreCondition() {
+		return ignoreCondition;
+	}
+
+	public void setIgnoreCondition(Boolean ignoreCondition) {
+		this.ignoreCondition = ignoreCondition;
+	}
+
 	@Override
 	public QueryParamDTO clone() {
 		QueryParamDTO queryParamDTO = new QueryParamDTO();
@@ -152,6 +165,7 @@ public class QueryParamDTO {
 		queryParamDTO.setSearchCount(getSearchCount());
 		queryParamDTO.setColumnNames(getColumnNames());
 		queryParamDTO.setEnablePage(getEnablePage());
+		queryParamDTO.setIgnoreCondition(getIgnoreCondition());
 		return queryParamDTO;
 	}
 }

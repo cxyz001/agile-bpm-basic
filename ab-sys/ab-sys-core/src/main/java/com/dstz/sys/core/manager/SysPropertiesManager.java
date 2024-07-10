@@ -25,4 +25,5 @@ public interface SysPropertiesManager extends AbBaseManager<SysProperties> {
      * 重新读取属性配置。
      */
     void reloadProperty();
+
 }

@@ -1,14 +1,17 @@
 package com.dstz.base.common.enums;
-
+/**
+ * <pre>
+ * 目前基于：elementui的tag 5种类型
+ * </pre>
+ * @author aschs
+ * @date 2023年12月26日
+ * @owner 大世同舟
+ */
 public enum LabelCss {
-	/**
-	 * 白色
-	 */
-	DEFAULT("default","默认"),
 	/**
 	 * 蓝色
 	 */
-	PRIMARY("primary","主色调"),
+	PRIMARY("","主色调"),
 	/**
 	 * 绿色
 	 */
@@ -18,9 +21,13 @@ public enum LabelCss {
 	 */
 	WARNING("warning","警告"),
 	/**
-	 * 红色
+	 * 危险
 	 */
-	ERROR("error","错误"),
+	DANGER("danger","错误"),
+	/**
+	 * 信息
+	 */
+	INFO("info","信息"),
 	;
 	
 	/**

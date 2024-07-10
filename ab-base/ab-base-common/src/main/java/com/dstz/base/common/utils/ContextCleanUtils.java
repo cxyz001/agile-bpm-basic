@@ -3,8 +3,11 @@ package com.dstz.base.common.utils;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import org.springframework.util.Assert;
+import org.springframework.util.function.SingletonSupplier;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * 上下文清理工具类
@@ -36,6 +39,15 @@ public class ContextCleanUtils {
     private final static Map<Phase, List<Runnable>> CONTEXT_CLEAN_REGISTRY = MapUtil.newHashMap();
 
     /**
+     * 提升性能，在第一次调用获取所有执行方法
+     */
+    private final static AtomicReference<SingletonSupplier<List<Runnable>>> CLEAN_ALL_REGISTRY = new AtomicReference<>(newCleanAllRegistrySupplier());
+
+    private static SingletonSupplier<List<Runnable>> newCleanAllRegistrySupplier() {
+        return SingletonSupplier.of(() -> CONTEXT_CLEAN_REGISTRY.values().stream().flatMap(List::stream).distinct().collect(Collectors.toList()));
+    }
+
+    /**
      * 注册清理方法
      *
      * @param runnable 清理运行方法
@@ -43,8 +55,9 @@ public class ContextCleanUtils {
     public static void register(Runnable runnable, Phase... phases) {
         Assert.state(ArrayUtil.isNotEmpty(phases), "phases parameter must");
         for (Phase phase : phases) {
-            CONTEXT_CLEAN_REGISTRY.computeIfAbsent(phase, k -> new LinkedList<>()).add(runnable);
+            CONTEXT_CLEAN_REGISTRY.computeIfAbsent(phase, k -> new ArrayList<>()).add(runnable);
         }
+        CLEAN_ALL_REGISTRY.lazySet(newCleanAllRegistrySupplier());
     }
 
     /**
@@ -53,18 +66,23 @@ public class ContextCleanUtils {
      * @param phases 执行清理
      */
     public static void execute(Phase... phases) {
-        Assert.state(phases != null, "phases parameter must");
-        // 调用一次
-        HashSet<Runnable> onceHashSet = new HashSet<>();
-        for (Phase phase : phases) {
-            CONTEXT_CLEAN_REGISTRY.getOrDefault(phase, Collections.emptyList()).stream().filter(onceHashSet::add).forEach(Runnable::run);
+        if (phases == null) {
+            throw new IllegalStateException("Phases parameter must");
         }
+        Set<Runnable> onceSet = new HashSet<>();
+        for (Phase phase : phases) {
+            List<Runnable> runnableList = CONTEXT_CLEAN_REGISTRY.get(phase);
+            if (runnableList != null) {
+                onceSet.addAll(runnableList);
+            }
+        }
+        onceSet.forEach(Runnable::run);
     }
 
     /**
      * 执行清理所有
      */
     public static void executeAll() {
-        execute(Phase.values());
+        CLEAN_ALL_REGISTRY.get().obtain().forEach(Runnable::run);
     }
 }

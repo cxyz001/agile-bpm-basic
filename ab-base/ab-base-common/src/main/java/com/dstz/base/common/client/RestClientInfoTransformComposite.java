@@ -1,5 +1,6 @@
 package com.dstz.base.common.client;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -53,7 +54,7 @@ public class RestClientInfoTransformComposite implements RestClientInfoTransform
 	 * @return cookie string
 	 */
 	public String getCookiesString() {
-		return getCookies().entrySet().stream().map(o -> StrUtil.join("=", o.getKey(), o.getValue())).collect(Collectors.joining(StrPool.SEMICOLON));
+		return getCookies().entrySet().stream().map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue())).collect(Collectors.joining(StrPool.SEMICOLON));
 	}
 
 	/**

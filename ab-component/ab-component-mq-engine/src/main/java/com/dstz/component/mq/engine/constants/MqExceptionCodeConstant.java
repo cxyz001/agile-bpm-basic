@@ -9,7 +9,9 @@ import com.dstz.base.common.codes.IBaseCode;
  */
 public enum MqExceptionCodeConstant implements IBaseCode {
 
-    SEND_ERROR("send_error", "消息发送失败,{}"),
+    SEND_ERROR("send_error", "消息发送失败 {}"),
+    SYNC_SEND_ERROR("sync_send_error", "-同步消息发送失败 {}"),
+    EMAIL_SEND_ERROR("email_send_error", "-邮件发送失败 {}"),
     ;
 
     private final String code;

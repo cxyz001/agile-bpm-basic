@@ -5,10 +5,10 @@
 
 - upgrade 为每个版本升级的SQL，请根据自己当下版本，执行至 升级后的版本
 
-- changeSQL 是每个版本内 更新的SQL，用于开发环境，最终会整理成 upgradeSQL 。 
+- changeSQL 是每个版本内 更新的SQL，用于开发环境，最终会整理成 upgradeSQL 。
 
 
-
+ 
 
 我们 s2 是最新的初始化SQL
 

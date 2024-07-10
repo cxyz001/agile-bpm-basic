@@ -1,14 +1,8 @@
 package com.dstz.base.enums;
 
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import com.dstz.base.common.property.PropertyEnum;
-import com.dstz.base.utils.JdbcUtils;
-import org.springframework.util.StringUtils;
-
-import javax.sql.DataSource;
 import java.util.Arrays;
+
+import org.springframework.util.StringUtils;
 
 /**
  * 数据库类型
@@ -20,37 +14,47 @@ public enum AbDbType {
     /**
      * MYSQL
      */
-    MYSQL("MySQL", "mysql", "MySQL数据库"),
+    MYSQL("MySQL", "mysql", "MySQL数据库","com.mysql.jdbc.Driver", "jdbc:mysql://主机:3306/数据库名?useUnicode=true&characterEncoding=utf-8"),
+    /**
+     * MARIADB
+     */
+    MARIADB("Mariadb", "mariadb", "Mariadb数据库","org.mariadb.jdbc.Driver", "jdbc:mariadb://主机:3306/数据库名?useUnicode=true&characterEncoding=utf-8"),
 
     /**
      * ORACLE
      */
-    ORACLE("Oracle", "oracle", "Oracle数据库"),
+    ORACLE("Oracle", "oracle", "Oracle数据库","oracle.jdbc.OracleDriver", "jdbc:oracle:thin:@主机:1521:数据库实例"),
 
     /**
      * SQLSERVER
      */
-    SQLSERVER("Microsoft SQL Server", "sqlserver", "SQLServer数据库"),
+    SQLSERVER("Microsoft SQL Server", "sqlserver", "SQLServer数据库","com.microsoft.sqlserver.jdbc.SQLServerDriver", "jdbc:sqlserver://主机:1433;databaseName=数据库名"),
 
     /**
      * POSTGRE
      */
-    POSTGRESQL("PostgreSQL", "postgresql", "Postgre数据库"),
+    POSTGRESQL("PostgreSQL", "postgresql", "Postgre数据库","org.postgresql.Driver", "jdbc:postgresql://主机:5432/postgres"),
 
     /**
      * Kingbase
      */
-    KINGBASE("kingbasees", "kingbasees", "人大金仓数据库"),
+    KINGBASE("kingbasees", "kingbasees", "人大金仓数据库","com.kingbase8.Driver", "jdbc:kingbase://主机:54321/bpm"),
 
     /**
      * 达梦数据库
      */
-    DM("DM DBMS", "DM", "达梦数据库"),
-    
+    DM("DM DBMS", "DM", "达梦数据库","dm.jdbc.driver.DmDriver","jdbc:dm://主机:5236/bpm"),
+
+    /**
+     * H2 数据库
+     */
+    H2("H2", "H2", "H2数据库", "org.h2.Driver", "jdbc:h2://路径"),
+
     /**
      * 未知数据库
      */
-    UNKNOW(null, "UNKNOW", "未知数据库");
+    UNKNOW(null, "UNKNOW", "未知数据库",null,null);
+
 
     /**
      * 数据库厂商名称
@@ -67,10 +71,21 @@ public enum AbDbType {
      */
     private final String desc;
 
-    AbDbType(String productName, String db, String desc) {
+    /**
+     * 驱动类型
+     */
+    private final String driverClassName;
+    /**
+     * 默认的url
+     */
+    private final String defaultUrl;
+
+    AbDbType(String productName, String db, String desc, String driverClassName, String defaultUrl) {
         this.productName = productName;
         this.db = db;
         this.desc = desc;
+        this.driverClassName = driverClassName;
+        this.defaultUrl = defaultUrl;
     }
 
     public String getProductName() {
@@ -83,6 +98,14 @@ public enum AbDbType {
 
     public String getDesc() {
         return desc;
+    }
+
+    public String getDriverClassName() {
+        return driverClassName;
+    }
+
+    public String getDefaultUrl() {
+        return defaultUrl;
     }
 
     /**
@@ -123,26 +146,5 @@ public enum AbDbType {
             }
         }
         return UNKNOW;
-    }
-
-    /**
-     * 当前数据库类型
-     *
-     * @return 数据库类型
-     */
-    public static AbDbType currentDbType() {
-        String jdbcType = PropertyEnum.JDBC_TYPE.getYamlValue(String.class);
-        if (CharSequenceUtil.isEmpty(jdbcType)) {
-            synchronized (AbDbType.class) {
-                jdbcType = PropertyEnum.JDBC_TYPE.getYamlValue(String.class);
-                if (CharSequenceUtil.isEmpty(jdbcType)) {
-                    DataSource dataSource = SpringUtil.getBean(DataSource.class);
-                    jdbcType = JdbcUtils.getConnectionProductName(dataSource);
-                    Assert.notBlank(jdbcType, "无法从数据源连接中获取到数据库类型，您可通过环境变量({})指定", PropertyEnum.JDBC_TYPE.getKey());
-                    System.setProperty(PropertyEnum.JDBC_TYPE.getKey(), jdbcType);
-                }
-            }
-        }
-        return getDbType(jdbcType);
     }
 }

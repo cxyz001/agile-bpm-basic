@@ -36,6 +36,16 @@ public class SysConnectRecordManagerImpl extends AbBaseManagerImpl<SysConnectRec
     }
 
     @Override
+    public List<SysConnectRecord> getBySourceId(List<String> sourceIds, String type) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.in("source_id_", sourceIds);
+        if (StrUtil.isNotEmpty(type)) {
+            queryWrapper.eq("type_", type);
+        }
+        return sysConnectRecordMapper.selectList(queryWrapper);
+    }
+
+    @Override
     public void removeBySourceId(String sourceId, String type) {
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("source_id_", sourceId);

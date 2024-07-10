@@ -161,8 +161,4 @@ public class EnumUtil {
             }
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println(EnumUtil.toJSON("com.dstz.bus.api.constant.BusinessObjectPersistenceType"));
-    }
 }

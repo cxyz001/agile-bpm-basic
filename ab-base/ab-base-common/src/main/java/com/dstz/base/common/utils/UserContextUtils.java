@@ -1,13 +1,16 @@
 package com.dstz.base.common.utils;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.dstz.base.common.context.UserContext;
 import com.dstz.base.common.enums.GlobalApiCodes;
 import com.dstz.base.common.exceptions.BusinessException;
+import com.dstz.base.common.exceptions.BusinessMessage;
+import com.dstz.org.api.UserApi;
 import com.dstz.org.api.model.IGroup;
 import com.dstz.org.api.model.IUser;
+import org.springframework.util.function.SingletonSupplier;
 
 import java.util.Optional;
 import java.util.Set;
@@ -19,7 +22,7 @@ import java.util.Set;
  */
 public class UserContextUtils {
 
-    private static volatile UserContext userContext;
+    private static final SingletonSupplier<UserContext> USER_CONTEXT_SUPPLER = SingletonSupplier.of(() -> SpringUtil.getBean(UserContext.class));
 
     private UserContextUtils() throws IllegalAccessException {
         throw new IllegalAccessException();
@@ -31,12 +34,7 @@ public class UserContextUtils {
      * @return 用户上下文
      */
     public static UserContext getUserContext() {
-        if (userContext == null) {
-            synchronized (UserContextUtils.class) {
-                userContext = SpringUtil.getBean(UserContext.class);
-            }
-        }
-        return userContext;
+        return USER_CONTEXT_SUPPLER.obtain();
     }
 
     /**
@@ -102,6 +100,7 @@ public class UserContextUtils {
         return getUserContext().getOrg().map(IGroup::getGroupId).orElse(null);
     }
 
+
     /**
      * 是否超级管理员
      *
@@ -125,7 +124,22 @@ public class UserContextUtils {
      * @return
      */
 	public static Set<String> getFilterUserIds(String userId) {
-		// TODO 返回 工作交接
-		return CollectionUtil.newHashSet(UserContextUtils.getUserId());
+        return getUserContext().getFilterUserIds(userId);
 	}
+
+    /**
+     * 通过用户账号设置当前用户
+     * @param account 用户账号
+     */
+	public static void setUserByAccount(String account){
+	    Assert.notEmpty(account,()->new BusinessMessage(GlobalApiCodes.PARAMETER_INVALID.formatDefaultMessage("用户账号不能为空")));
+
+        final UserApi userApi = SpringUtil.getBean(UserApi.class);
+        IUser user = userApi.getByUsername(account);
+        Assert.notNull(user,()->new BusinessException(GlobalApiCodes.DATA_NOT_FOUND.formatDefaultMessage(String.format("用户账号【%s】",account))));
+
+        UserContext userContext = getUserContext();
+        userContext.clear();
+        userContext.setUser(user);
+    }
 }

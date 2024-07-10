@@ -37,7 +37,7 @@ public class CommonMessageQueueProducer implements JmsProducer {
             MethodUtils.invokeMethod(jmsTemplate, "convertAndSend", JmsDestinationConstant.DEFAULT_NAME, message);
         } catch (Exception e) {
             LOGGER.warn("JMS发送失败, 发送参数：{}", JsonUtils.toJSONString(message));
-            throw new BusinessException(MqExceptionCodeConstant.SEND_ERROR, e);
+            throw new BusinessException(MqExceptionCodeConstant.SEND_ERROR.formatDefaultMessage(e.getMessage()), e);
         }
     }
 

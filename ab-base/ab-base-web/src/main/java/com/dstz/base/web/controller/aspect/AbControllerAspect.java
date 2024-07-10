@@ -1,6 +1,7 @@
 package com.dstz.base.web.controller.aspect;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.servlet.ServletUtil;
@@ -23,12 +24,15 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -69,6 +73,43 @@ public class AbControllerAspect implements MethodInterceptor {
 		}
 	}
 
+	/**
+	 * 获取请求头
+	 *
+	 * @param request request
+	 * @return 请求头Map
+	 */
+	private MultiValueMap<String, String> getHeaderMap(HttpServletRequest request) {
+		MultiValueMap<String, String> headerValueMap = new LinkedMultiValueMap<>();
+
+		Enumeration<String> headerNames = request.getHeaderNames();
+		while (headerNames.hasMoreElements()) {
+			String headerName = headerNames.nextElement();
+			Enumeration<String> headerValue = request.getHeaders(headerName);
+			while (headerValue.hasMoreElements()) {
+				headerValueMap.add(headerName, headerValue.nextElement());
+			}
+		}
+		return headerValueMap;
+	}
+
+	/**
+	 * 获取Cookie中的 signature 字段，如果没有则返回null
+	 * @param request
+	 */
+	private String getCookieSignature(HttpServletRequest request){
+		final Cookie[] cookies = request.getCookies();
+		if (ArrayUtil.isEmpty(cookies)) {
+			return null;
+		}
+		// 取Cookie
+		return Arrays.stream(cookies)
+				.filter(cookie -> cookie.getName().equalsIgnoreCase("signature"))
+				.map(Cookie::getValue)
+				.findFirst()
+				.orElse(null);
+	}
+
 	@Nullable
 	@Override
 	public Object invoke(@Nonnull MethodInvocation invocation) throws Throwable {
@@ -82,29 +123,30 @@ public class AbControllerAspect implements MethodInterceptor {
 
 		AbRequestLog.Builder requestLogBuilder = AbRequestLog.newBuilder();
 		requestLogBuilder.withTraceId(traceId);
-		getCurrentUser().ifPresent(u -> requestLogBuilder.withUserId(u.getUserId()).withUsername(u.getUsername()));
+		getCurrentUser().ifPresent(u -> requestLogBuilder.withUserId(u.getUserId()).withUsername(u.getUsername()).withFullName(u.getFullName()));
 		getCurrentGroup().ifPresent(g->requestLogBuilder.withGroupId(g.getGroupId()).withGroupName(g.getGroupName()));
 		requestLogBuilder.withClientIp(getClientIp(request));
 		requestLogBuilder.withRequestMethod(request.getMethod()).withUrl(request.getRequestURL().toString());
 		requestLogBuilder.withPathPattern((String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE));
 		requestLogBuilder.withRequestTime(new Date());
-		requestLogBuilder.withRequestHeaderMap(ServletUtil.getHeaderMap(request)).withRequestParameterMap(parameterMap);
+		requestLogBuilder.withRequestHeaderMap(getHeaderMap(request)).withRequestParameterMap(parameterMap);
 		requestLogBuilder.withRequestBody(Arrays.stream(handlerMethod.getMethodParameters()).filter(item -> item.hasParameterAnnotation(RequestBody.class)).map(MethodParameter::getParameterIndex).findFirst().map(parameterIndex -> invocation.getArguments()[parameterIndex]).orElse(null));
 		// 放置到request请求中，供其他地方获取设值
 		request.setAttribute(AbRequestLog.class.getName(), requestLogBuilder.build());
-
-		SpringUtil.publishEvent(AbRequestLogEvent.createPreProcess(requestLogBuilder.build()));
+		//设置签名
+		requestLogBuilder.withSignature(getCookieSignature(request));
 
 		Throwable throwable = null;
 		Object returnVal = null;
 		try {
+			SpringUtil.publishEvent(AbRequestLogEvent.createPreProcess(requestLogBuilder.build()));
 			returnVal = invocation.proceed();
 		} catch (Throwable e) {
 			throwable = e;
 		}
 		requestLogBuilder.withResponseTime(new Date());
 		// 再重新获取下用户信息，用于登录后信息获取
-		UserContextUtils.getUser().ifPresent(u -> requestLogBuilder.withUserId(u.getUserId()).withUsername(u.getUsername()));
+		UserContextUtils.getUser().ifPresent(u -> requestLogBuilder.withUserId(u.getUserId()).withUsername(u.getUsername()).withFullName(u.getFullName()));
 		getCurrentGroup().ifPresent(g->requestLogBuilder.withGroupId(g.getGroupId()).withGroupName(g.getGroupName()));
 		// 异常信息
 		if (Objects.nonNull(throwable)) {
@@ -122,7 +164,9 @@ public class AbControllerAspect implements MethodInterceptor {
 		// 正常信息返回
 		if (returnVal instanceof ResponseEntity) {
 			ResponseEntity<?> responseEntity = (ResponseEntity<?>) returnVal;
-			if (!(responseEntity.getBody() instanceof byte[])) {
+			if (responseEntity.getBody() instanceof byte[]) {
+				requestLogBuilder.withResponseBody("return value is byte");
+			}else{
 				requestLogBuilder.withResponseBody(responseEntity.getBody());
 			}
 		} else {

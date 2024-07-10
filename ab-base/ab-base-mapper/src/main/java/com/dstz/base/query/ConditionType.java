@@ -63,7 +63,7 @@ public enum ConditionType {
 	/**
 	 * 在...之间
 	 */
-	BETWEEN("BT", "between", "在...之间", new String[] { "number", "date" });
+	BETWEEN("BT", ">=,<=", "在...之间", new String[] { "number", "date" });
 
 	private String key;
 	private String condition;

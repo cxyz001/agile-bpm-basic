@@ -130,7 +130,7 @@ public abstract class AbCrudController<T extends IPersistentEntity> extends AbBa
     // 演示环境禁止删除操作
     protected void checkIsDemoEnvironment() {
     	if("demoa5.tongzhouyun.com".equals(AbRequestUtils.getHttpServletRequest().getServerName())) {
-        	 throw new BusinessException(GlobalApiCodes.REMOTE_CALL_ERROR.formatDefaultMessage("演示环境禁止删除操作，访问信息已经被统计！"));
+        	 throw new BusinessException(GlobalApiCodes.REMOTE_CALL_ERROR.formatDefaultMessage("演示环境禁止当前操作，访问信息已经被统计！"));
         }
     }
     

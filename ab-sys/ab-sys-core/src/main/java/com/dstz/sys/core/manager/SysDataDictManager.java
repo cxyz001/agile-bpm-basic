@@ -1,11 +1,12 @@
 package com.dstz.sys.core.manager;
 
 import com.dstz.base.api.dto.QueryParamDTO;
-import com.dstz.sys.rest.model.vo.SysDataDictVO;
+import com.dstz.sys.api.vo.SysDataDictVO;
 import com.dstz.sys.core.entity.SysDataDict;
 import com.dstz.base.manager.AbBaseManager;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -52,4 +53,11 @@ public interface SysDataDictManager extends AbBaseManager<SysDataDict> {
      */
     @Override
     int update(SysDataDict entry);
+
+
+    /**
+     * 更新字典缓存
+     * @param dictKeys
+     */
+    void updateCache(Set<String> dictKeys);
 }

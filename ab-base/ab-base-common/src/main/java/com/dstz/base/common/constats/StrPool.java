@@ -2,7 +2,7 @@ package com.dstz.base.common.constats;
 
 /**
  * 字符串常量池
- *
+ * 
  * @author Jeff
  */
 public interface StrPool extends cn.hutool.core.text.StrPool {
@@ -77,7 +77,7 @@ public interface StrPool extends cn.hutool.core.text.StrPool {
 	String STRING_PWD_ONZ = "1";
 	// 英文 冒号
 	String COLON = ":";
-	
+
 	// 中文 冒号
 	String COLON_ZN = "：";
 
@@ -90,4 +90,17 @@ public interface StrPool extends cn.hutool.core.text.StrPool {
 	 * 默认数据源别名
 	 */
 	String DEFAULT_DATASOURCE_ALIAS = "datasourceDefault";
+	String EQUAL = "=";
+
+	String AND = "&";
+
+	String SINGLE_QUOTES = "'";
+
+	String  WX= "workWeChat";
+
+	String  QYWX= "qywx";
+
+	String  DD= "dingTalk";
+
+	String  LOGINTYPE  = "quickLoginType";
 }

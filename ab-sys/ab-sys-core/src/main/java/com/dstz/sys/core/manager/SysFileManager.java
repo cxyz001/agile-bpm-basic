@@ -2,10 +2,8 @@ package com.dstz.sys.core.manager;
 
 import com.dstz.base.manager.AbBaseManager;
 import com.dstz.sys.core.entity.SysFile;
-import com.dstz.sys.rest.model.dto.OperateOnlineDocDTO;
 import com.dstz.sys.rest.model.dto.UpdateFileDTO;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -28,6 +26,32 @@ public interface SysFileManager extends AbBaseManager<SysFile> {
      * @return
      */
     SysFile upload(InputStream is, String fileName, String type);
+
+    /**
+     * <pre>
+     * 上传指定ID的附件
+     * </pre>
+     *
+     * @param is
+     * @param fileId
+     * @param fileName
+     * @param type
+     * @return
+     */
+    SysFile upload(InputStream is, String fileId, String fileName, String type);
+
+    /**
+     * <pre>
+     * 只在uploader上传附件,不创建附件信息的数据
+     * </pre>
+     *
+     * @param is
+     * @param fileId
+     * @param fileName
+     * @param type
+     * @return
+     */
+    String uploader(InputStream is, String fileId, String fileName, String type);
 
     /**
      * <pre>
@@ -61,19 +85,4 @@ public interface SysFileManager extends AbBaseManager<SysFile> {
      * @return
      */
     int update(UpdateFileDTO updateDTO);
-
-    /**
-     * 打开在线文档
-     * @param operateDTO
-     * @param requestUrl agileBpm 服务地址
-     * @return
-     */
-    String openFile(OperateOnlineDocDTO operateDTO,String requestUrl);
-
-    /**
-     * 关闭在线文档
-     * @param operateDTO
-     * @return
-     */
-    Boolean closeFile(OperateOnlineDocDTO operateDTO);
 }

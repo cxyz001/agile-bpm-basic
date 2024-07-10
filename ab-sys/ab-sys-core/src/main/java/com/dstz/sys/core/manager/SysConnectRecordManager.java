@@ -25,6 +25,14 @@ public interface SysConnectRecordManager extends AbBaseManager<SysConnectRecord>
     List<SysConnectRecord> getByTargetId(String targetId, String type);
 
     /**
+     * 根据资源Id和类型获取
+     * @param sourceId
+     * @param type
+     * @return
+     */
+    List<SysConnectRecord> getBySourceId(List<String> sourceIds, String type);
+
+    /**
      * 根据源Id删除记录
      *
      * @param sourceId

@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -23,12 +24,7 @@ import com.dstz.base.query.QuerySort;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 查询的默认实现
@@ -194,12 +190,12 @@ public class DefaultAbQueryFilter implements AbQueryFilter {
         }
         queryConditionGroupParam.forEach((key, val) -> {
             // 是否queryFilter约定入参
-            if (val == null || !StrUtil.contains(key, StrPool.DOLLAR)) {
+            if (!StrUtil.contains(key, StrPool.DOLLAR)) {
                 return;
             }
 
-            // 值为空跳过查询条件
-            if (ObjectUtil.isEmpty(val)) {
+            // 值为空跳过查询条件（当条件为判空和不判空时，允许值为空）
+            if (ObjectUtil.isEmpty(val) && !key.endsWith(ConditionType.IS_NULL.key()) && !key.endsWith(ConditionType.NOTNULL.key())) {
                 return;
             }
 
@@ -267,13 +263,15 @@ public class DefaultAbQueryFilter implements AbQueryFilter {
                 return getInValueSql(strValue);
 
             case LEFT_LIKE:
-                return "%" + String.valueOf(strValue);
+                return CharSequenceUtil.addPrefixIfNot(Convert.toStr(strValue), "%");
 
             case RIGHT_LIKE:
-                return String.valueOf(strValue) + "%";
+                return CharSequenceUtil.addSuffixIfNot(Convert.toStr(strValue), "%");
 
             case LIKE:
-                return "%" + String.valueOf(strValue).replace("_", "\\_").replace("%", "%") + "%";
+                String likeValue = Convert.toStr(strValue);
+                likeValue = CharSequenceUtil.addPrefixIfNot(likeValue, "%");
+                return CharSequenceUtil.addSuffixIfNot(likeValue, "%");
         }
 
         // 手动添加时无需转换数据类型
@@ -313,6 +311,10 @@ public class DefaultAbQueryFilter implements AbQueryFilter {
 
         StringBuilder inSqlStr = new StringBuilder();
         for (Object obj : listValue) {
+            //为空需要跳过，修复数值为逗号时，强行分割导致的字符串索引越界问题
+            if (ObjectUtil.isEmpty(obj)){
+                continue;
+            }
             String valueString = Objects.isNull(obj) ? null : obj.toString();
             if (StrUtil.isNotEmpty(valueString)) {
                 inSqlStr.append(CharUtil.SINGLE_QUOTE)
@@ -455,17 +457,6 @@ public class DefaultAbQueryFilter implements AbQueryFilter {
         this.getQueryFieldGroup().getFieldGroupMap().clear();
         return this;
     }
-
-
-    public static void main(String[] args) {
-        AbQueryFilter queryFilter = DefaultAbQueryFilter.buildWithFilter("b.userName", "张三", ConditionType.EQUAL)
-                .addFilter("a.userName", "张三,sss", ConditionType.IN);
-
-        System.out.println(queryFilter.generateQuerySql());
-
-
-    }
-
     @Override
     public AbQueryFilter eqFilter(String fildName, Object value) {
         return this.addFilter(fildName, value, ConditionType.EQUAL);

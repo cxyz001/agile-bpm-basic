@@ -10,6 +10,7 @@
         <result column="name_" property="name" />
         <result column="dict_key_" property="dictKey" />
         <result column="type_code_" property="typeCode" />
+        <result column="disable_" property="disable" />
         <result column="sn_" property="sn" />
         <result column="dict_type_" property="dictType" />
         <result column="extend1" property="extend1" />
@@ -29,9 +30,9 @@
             parent_id_=#{id}
     </select>
 
-    <select id="getDictNodeList"   parameterType="java.util.Map" resultMap="SysDataDict">
+    <select id="getDictNodeList"   parameterType="java.util.Map"  resultMap="SysDataDict">
         SELECT * FROM sys_data_dict  WHERE  dict_key_= #{dictKey}
-        <if test="!hasRoot">and dict_type_ = 'node'</if> order by sn_
+        <if test="!hasRoot">and dict_type_ = 'node'</if> order by sn_,create_time_ desc,id_ desc
     </select>
 
     <select id="isExistDict"   parameterType="java.util.Map" resultType="java.lang.Integer">

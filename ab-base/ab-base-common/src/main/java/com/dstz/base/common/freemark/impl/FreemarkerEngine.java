@@ -1,5 +1,6 @@
 package com.dstz.base.common.freemark.impl;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.dstz.base.common.enums.GlobalApiCodes;
 import com.dstz.base.common.exceptions.BusinessException;
@@ -46,7 +47,7 @@ public class FreemarkerEngine implements IFreemarkerEngine {
 
     }
 
-    @Override
+	@Override
     public String parseByString(String templateSource, Object model) {
         if (model != null && model instanceof Map) {
             //将所有表单生成器的实现类注入到模板引擎中
@@ -54,6 +55,7 @@ public class FreemarkerEngine implements IFreemarkerEngine {
             for (Entry<String, IFreemarkScript> scriptMap : scirptImpls.entrySet()) {
                 ((Map) model).put(scriptMap.getKey(), scriptMap.getValue());
             }
+            model = new freemarker.ext.beans.SimpleMapModel((Map)model, null);
         }
 
         try {
@@ -68,7 +70,7 @@ public class FreemarkerEngine implements IFreemarkerEngine {
             return writer.toString();
         } catch (Exception e) {
             LOG.error(String.format("freemaker模板【%s】解析失败：%s", templateSource, e.getMessage()));
-            throw new BusinessException(GlobalApiCodes.INTERNAL_ERROR.formatMessage("模板解析失败,可能原因为：{}", e.getMessage()), e);
+            throw new BusinessException(GlobalApiCodes.INTERNAL_ERROR.formatMessage("模板解析失败,可能原因为：{}", ExceptionUtil.getRootCause(e).getMessage()), ExceptionUtil.getRootCause(e));
         }
     }
 

@@ -204,4 +204,13 @@ public class SysFile extends AbModel<SysFile> {
     public Serializable pkVal() {
         return this.id;
     }
+
+    public SysFile(String id, String name, String path) {
+        this.id = id;
+        this.name = name;
+        this.path = path;
+    }
+
+    public SysFile() {
+    }
 }

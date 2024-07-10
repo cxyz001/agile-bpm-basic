@@ -1,10 +1,16 @@
 package com.dstz.component.mq.engine.config;
 
+import cn.hutool.extra.mail.MailAccount;
+import com.dstz.component.mq.engine.constants.MqEngineConstant;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportSelector;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.stereotype.Component;
 
 /**
  * 缓存相关配置

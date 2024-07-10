@@ -48,6 +48,19 @@ public class MessageTemplateVO implements Serializable {
      */
     private String templateParamJson;
 
+    /**
+     * 短信供应商模板code
+     */
+    private String smsTemplateCode;
+
+    public String getSmsTemplateCode() {
+        return smsTemplateCode;
+    }
+
+    public void setSmsTemplateCode(String smsTemplateCode) {
+        this.smsTemplateCode = smsTemplateCode;
+    }
+
     public String getCode() {
         return code;
     }

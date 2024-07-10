@@ -1,10 +1,9 @@
 package com.dstz.component.mq.engine.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-
 import com.dstz.component.mq.api.producer.JmsProducer;
 import com.dstz.component.mq.engine.producer.SynchronousQueueProducer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 
 /**
  * 同步消息队列配置

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.dstz.base.api.dto.PageListDTO;
 import com.dstz.base.entity.IPersistentEntity;
-import com.dstz.base.mapper.methods.AbBulkCreate;
 import com.dstz.base.query.AbQueryFilter;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.cursor.Cursor;
@@ -33,14 +32,6 @@ public interface AbBaseMapper<T extends IPersistentEntity> extends BaseMapper<T>
 	 * @return 影响行数
 	 */
 	int updateFullById(@Param(Constants.ENTITY) T entity);
-	
-	/**
-	 * 批量创建
-	 *
-	 * @param records 记录
-	 * @return 影响行数
-	 */
-	int bulkCreate(@Param(AbBulkCreate.METHOD_PARAM_NAME) Iterable<T> records);
 
 	/**
 	 * 根据条件查询游标
@@ -49,4 +40,12 @@ public interface AbBaseMapper<T extends IPersistentEntity> extends BaseMapper<T>
 	 * @return 游标
 	 */
 	Cursor<T> queryCursorByWrapper(@Param(Constants.WRAPPER) Wrapper<T> wrapper);
+
+	/**
+	 * 批量创建记录
+	 *
+	 * @param entityColl 实体集合
+	 * @return 影响行数
+	 */
+	int bulkCreate(@Param(Constants.COLL) Iterable<T> entityColl);
 }

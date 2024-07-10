@@ -1,5 +1,6 @@
 package com.dstz.component.mq.msg.engine.dto;
 
+import com.dstz.base.common.constats.StrPool;
 import com.dstz.base.common.identityconvert.SysIdentity;
 import com.dstz.component.msg.api.vo.CardTemplateData;
 
@@ -38,6 +39,7 @@ public class MsgImplDTO implements Serializable {
     //业务类型 参考com.dstz.base.common.constats.InnerMsgEnum
     private String innerMsgType;
 
+
     //扩展参数
     private Map<String, Object> extendVars = new HashMap<String, Object>();
 
@@ -50,9 +52,16 @@ public class MsgImplDTO implements Serializable {
         this.receivers = receivers;
     }
 
-    public MsgImplDTO(String subject,Map<String,String> templateParam, String htmlTemplate, CardTemplateData cardTemplateData, List<SysIdentity> receivers, String businessId, String innerMsgType, Map<String, Object> extendVars) {
+
+    public MsgImplDTO(String subject, String htmlTemplate, Map<String, Object> extendVars) {
         this.subject = subject;
-        this.templateParam = templateParam;
+        this.htmlTemplate = htmlTemplate;
+        this.extendVars = extendVars;
+    }
+
+
+    public MsgImplDTO(String subject,  String htmlTemplate, CardTemplateData cardTemplateData, List<SysIdentity> receivers, String businessId, String innerMsgType, Map<String, Object> extendVars) {
+        this.subject = subject;
         this.htmlTemplate = htmlTemplate;
         this.cardTemplateData = cardTemplateData;
         this.receivers = receivers;
@@ -60,6 +69,7 @@ public class MsgImplDTO implements Serializable {
         this.innerMsgType = innerMsgType;
         this.extendVars = extendVars;
     }
+
 
     public String getSubject() {
         return subject;

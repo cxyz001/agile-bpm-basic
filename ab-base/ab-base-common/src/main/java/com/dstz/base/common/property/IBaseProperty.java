@@ -3,6 +3,7 @@ package com.dstz.base.common.property;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.util.Objects;
 
@@ -56,6 +57,6 @@ public interface IBaseProperty {
     default <T> T getPropertyValue(Class<T> typeClass) {
         SysPropertyService sysPropertyService = SpringUtil.getBean(SysPropertyService.class);
         Object value = ObjectUtil.defaultIfNull(sysPropertyService.getValByCode(getKey()), getDefaultValue());
-        return Objects.isNull(value) ? null : Convert.convert(typeClass, value);
+        return Objects.isNull(value) ? null : DefaultConversionService.getSharedInstance().convert(value, typeClass);
     }
 }

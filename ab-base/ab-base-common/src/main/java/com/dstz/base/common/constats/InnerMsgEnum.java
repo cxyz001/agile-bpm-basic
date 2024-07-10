@@ -38,6 +38,10 @@ public enum InnerMsgEnum {
      * 站内信类型-流程催办
      */
     WF_URGE("wfUrge", "流程催办", 0),
+    /**
+     * 站内信类型-流程督办
+     */
+    WF_SUPERVISE("wfSupervise", "流程督办", 0),
 
     /**
      * 站内信类型-流程抄送
@@ -67,7 +71,13 @@ public enum InnerMsgEnum {
     WF_CARBON_COPY("carbonCopy", "流程传阅", 0),
 
     WF_RECALL("wfRecall", "流程撤回", 0),
-    ;
+
+    SYS_ERROR("sysError", "系统异常告警", 0),
+
+    /**
+     * 租户访问量
+     */
+    TENANT_PV("tenantPv", "租户访问量", 0);
 
     private final String key;
     private final String value;

@@ -25,6 +25,18 @@ public interface SysFileApi {
 
     /**
      * <pre>
+     * 上传附件或修改附件(附件ID存在则修改, 不存在则上传)
+     * </pre>
+     *
+     * @param is       文件流
+     * @param fileId   文件ID
+     * @param fileName 文件名称
+     * @return
+     */
+    void upload(InputStream is, String fileId, String fileName);
+
+    /**
+     * <pre>
      * 下载附件
      * 返回流
      * </pre>
@@ -44,13 +56,6 @@ public interface SysFileApi {
      */
     void delete(String... fileId);
 
-    /**
-     * <pre>
-     * 获取附件信息
-     * </pre>
-     *
-     * @param fileId 文件ID
-     */
-    SysFileDTO getById(String fileId);
+	SysFileDTO getById(String fileId);
 
 }

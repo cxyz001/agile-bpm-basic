@@ -6,19 +6,15 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.dstz.base.common.utils.UserContextUtils;
 import com.dstz.org.api.model.IGroup;
 import com.dstz.org.api.model.IUser;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -34,45 +30,43 @@ public class AbMetaObjectHandler implements MetaObjectHandler {
 	public void insertFill(MetaObject metaObject) {
 		Optional<IUser> currentUser = UserContextUtils.getUser();
 		Optional<IGroup> currentGroup = UserContextUtils.getGroup();
+
 		// 创建者ID
-		this.strictInsertFill(metaObject, "createBy", () -> currentUser.map(IUser::getUserId).orElse(StrUtil.EMPTY), String.class);
+		setFieldValueIfNull(metaObject, "createBy", () -> currentUser.map(IUser::getUserId).orElse(StrUtil.EMPTY));
 		// 创建者姓名
-		this.strictInsertFill(metaObject, "creator", () -> currentUser.map(IUser::getFullName).orElse(StrUtil.EMPTY), String.class);
+		setFieldValueIfNull(metaObject, "creator", () -> currentUser.map(IUser::getFullName).orElse(StrUtil.EMPTY));
 		// 创建时间
-		this.strictInsertFill(metaObject, "createTime", Date::new, Date.class);
+		setFieldValueIfNull(metaObject, "createTime", Date::new);
 		// 创建着所属组织ID
-		this.strictInsertFill(metaObject, "createOrgId", () -> currentGroup.map(IGroup::getGroupId).orElse(StrUtil.EMPTY), String.class);
-		updateFill(metaObject, currentUser);
+		setFieldValueIfNull(metaObject, "createOrgId", () -> currentGroup.map(IGroup::getGroupId).orElse(StrUtil.EMPTY));
+		// 更新者ID
+		setFieldValueIfNull(metaObject, "updateBy", () -> currentUser.map(IUser::getUserId).orElse(StrUtil.EMPTY));
+		// 更新人
+		setFieldValueIfNull(metaObject, "updater", () -> currentUser.map(IUser::getFullName).orElse(StrUtil.EMPTY));
+		// 更新时间
+		setFieldValueIfNull(metaObject, "updateTime", Date::new);
 		// 乐关锁默认字段
-		TableInfo tableInfo = TableInfoHelper.getTableInfo(AopUtils.getTargetClass(metaObject.getOriginalObject()));
-		TableFieldInfo versionFieldInfo = tableInfo.getVersionFieldInfo();
+		TableFieldInfo versionFieldInfo = findTableInfo(metaObject).getVersionFieldInfo();
 		if (versionFieldInfo != null) {
-			metaObject.setValue(versionFieldInfo.getField().getName(), getTypeDefaultValue(versionFieldInfo.getPropertyType()));
+			setFieldValueIfNull(metaObject, versionFieldInfo.getField().getName(), () -> getTypeDefaultValue(versionFieldInfo.getPropertyType()));
 		}
 	}
 
-	private void updateFill(MetaObject metaObject, Optional<IUser> currentUser) {
-		// 更新者ID
-		this.strictUpdateFill(metaObject, "updateBy", () -> currentUser.map(IUser::getUserId).orElse(StrUtil.EMPTY), String.class);
-		// 更新者
-		this.strictUpdateFill(metaObject, "updater", () -> currentUser.map(IUser::getFullName).orElse(StrUtil.EMPTY), String.class);
-		// 更新时间
-		this.strictUpdateFill(metaObject, "updateTime", Date::new, Date.class);
+	private void setFieldValueIfNull(MetaObject metaObject, String fieldName, Supplier<Object> supplier){
+		if (metaObject.hasSetter(fieldName) && metaObject.getValue(fieldName) == null) {
+			metaObject.setValue(fieldName, supplier.get());
+		}
 	}
 
 	@Override
 	public void updateFill(MetaObject metaObject) {
-		Optional<IUser> currentUser = UserContextUtils.getUser();
-		updateFill(metaObject, currentUser);
-	}
-	
-	@Override
-	public MetaObjectHandler strictFillStrategy(MetaObject metaObject, String fieldName, Supplier<?> fieldVal) {
-		Object obj = fieldVal.get();
-		if (Objects.nonNull(obj)) {
-			metaObject.setValue(fieldName, obj);
-		}
-		return this;
+		UserContextUtils.getUser().ifPresent(currentUser -> {
+			// 更新者ID
+			setFieldValByName("updateBy", currentUser.getUserId(), metaObject);
+			// 更新人
+			setFieldValByName("updater", currentUser.getFullName(), metaObject);
+		});
+		setFieldValByName("updateTime", new Date(), metaObject);
 	}
 
 	private Object getTypeDefaultValue(Class<?> typeClass) {

@@ -11,10 +11,10 @@
         <result column="now_value_" property="nowValue" />
     </resultMap>
 
-    <select id="selectByConfigIdAndReviveValue" parameterType="map" resultMap="SysSerialNoRevive">
+    <select id="selectByCodeAndReviveValue" parameterType="map" resultMap="SysSerialNoRevive">
         select * from sys_serial_no_revive
         <where>
-            config_id_ = #{configId,jdbcType=VARCHAR} and revive_value_ = #{reviveValue,jdbcType=VARCHAR}
+            code_ = #{code,jdbcType=VARCHAR} and revive_value_ = #{reviveValue,jdbcType=VARCHAR}
         </where>
         for update
     </select>

@@ -16,11 +16,11 @@ import com.dstz.base.manager.impl.AbBaseManagerImpl;
 import com.dstz.sys.core.entity.SysProperties;
 import com.dstz.sys.core.manager.SysPropertiesManager;
 import com.dstz.sys.core.mapper.SysPropertiesMapper;
-
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 系统属性 通用服务实现类
@@ -47,27 +47,25 @@ public class SysPropertiesManagerImpl extends AbBaseManagerImpl<SysProperties> i
 
     @Override
     public String getValByCode(String code) {
-        final String currentEnv = StrUtil.emptyToDefault(SpringUtil.getActiveProfile(), EnvironmentConstants.DEV.getKey());
-        final String cacheKey = StrUtil.join(StrUtil.COLON, currentEnv, code);
+        final String currentEnv = StringUtils.defaultString(SpringUtil.getActiveProfile(), EnvironmentConstants.DEV.getKey());
+        final String cacheKey = currentEnv + StrUtil.COLON + code;
         String value = cache.get(AbCacheRegionConstant.PROPERTIES_CACHE_REGION, cacheKey, () -> loadPropertyValue(currentEnv, code));
         return StrUtil.emptyToNull(value);
     }
 
     private String loadPropertyValue(String environment, String code) {
         LambdaQueryWrapper<SysProperties> queryWrapper = Wrappers.lambdaQuery(SysProperties.class)
-                .select(SysProperties::getEncrypt, SysProperties::getValue)
-                .in(SysProperties::getEnvironment, StringUtils.upperCase(environment),EnvironmentConstants.DEV.getKey())
+                .select(SysProperties::getEncrypt, SysProperties::getValue, SysProperties::getEnvironment)
+                .in(SysProperties::getEnvironment, StringUtils.upperCase(environment), EnvironmentConstants.DEV.getKey())
                 .eq(SysProperties::getCode, code);
 
         List<SysProperties> sysPropertiesList = sysPropertiesMapper.selectList(queryWrapper);
-        
+
         // 多环境下，取出 指定环境以及dev环境的参数，如果只有一个配置项，返回，如果多个，则过滤出对应环境的返回
-        SysProperties sysProperties = sysPropertiesList.size() == 1 ? sysPropertiesList.get(0): null;
-        if(sysProperties == null && sysPropertiesList.size()>1) {
-        	sysProperties = sysPropertiesList.stream().filter(o-> o.getEnvironment().equals(StringUtils.upperCase(environment))).findFirst().orElse(null);
-        }
-        
-        if (sysProperties == null) {
+        SysProperties sysProperties = Optional.ofNullable(CollUtil.findOne(sysPropertiesList, o -> StrUtil.equalsIgnoreCase(o.getEnvironment(), environment)))
+                .orElseGet(() -> CollUtil.findOne(sysPropertiesList, o -> StrUtil.equalsIgnoreCase(o.getEnvironment(), EnvironmentConstants.DEV.getKey())));
+
+        if (sysProperties == null || (sysProperties != null && sysProperties.getValue() == null)) {
             return StrUtil.EMPTY;
         }
         return NumberPool.BOOLEAN_TRUE.equals(sysProperties.getEncrypt()) ? EncryptUtil.decrypt(sysProperties.getValue()) : sysProperties.getValue();

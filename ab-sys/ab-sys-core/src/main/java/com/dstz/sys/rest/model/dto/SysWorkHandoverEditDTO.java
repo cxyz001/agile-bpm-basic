@@ -22,6 +22,8 @@ public class SysWorkHandoverEditDTO implements Serializable {
      */
     private Set<String> receiveUserId;
 
+    private String desc;
+
     public String getUserId() {
         return userId;
     }
@@ -36,5 +38,13 @@ public class SysWorkHandoverEditDTO implements Serializable {
 
     public void setReceiveUserId(Set<String> receiveUserId) {
         this.receiveUserId = receiveUserId;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }
