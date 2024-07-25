@@ -15,6 +15,9 @@
 
 文档地址：[文档](http://www.agilebpm.cn/)
 
+# 授权说明
+本项目采用 GPL开源协议，任何使用者需要登记副本，否则视为侵权，**[登记地址入口]（https://gitee.com/agile-bpm/agile-bpm-basic/issues/IAFE9E）**
+
 # 技术交流群
 
 q群3：108698205，如果进了技术群，请先看群公告再问问题，不方便QQ的可添加微信 agileBPM01 ，他会拉进微信群
