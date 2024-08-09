@@ -15,6 +15,8 @@
 
 文档地址：[文档](http://www.agilebpm.cn/)
 
+Docker部署: [docker镜像部署文档](https://alidocs.dingtalk.com/i/p/B3YxXAenW2EXNy2jBVzxKl2OE8rj4GOa)
+
 # 授权说明
 本项目采用[GPL开源协议](https://gitee.com/agile-bpm/agile-bpm-basic/blob/master/LICENSE)以及[补充协议](http://a1.agilebpm.cn/zh-cn/more/agilebpm_license.html)任何使用者在需要遵循协议，gpl协议要求使用者登记副本，否则视为侵权
 **[登记地址入口](https://gitee.com/agile-bpm/agile-bpm-basic/issues/IAFE9E)**
