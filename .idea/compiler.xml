@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="ab-cms-core" />
+        <module name="ab-component-mq-engine" />
+        <module name="ab-sys-api" />
+        <module name="ab-groovy-script-api" />
+        <module name="ab-component-upload-engine" />
+        <module name="ab-base-api" />
+        <module name="ab-component-pubsub-api" />
+        <module name="ab-spring-boot-app" />
+        <module name="ab-base-web" />
+        <module name="ab-spring-boot-starter" />
+        <module name="ab-component-j2cache" />
+        <module name="ab-component-mq-api" />
+        <module name="ab-sys-core" />
+        <module name="ab-code-generator" />
+        <module name="ab-base-common" />
+        <module name="ab-cms-api" />
+        <module name="ab-auth-core" />
+        <module name="ab-component-pubsub-core" />
+        <module name="ab-auth-spring-security-oauth2" />
+        <module name="ab-groovy-script-engine" />
+        <module name="ab-component-upload-api" />
+        <module name="ab-component-msg-api" />
+        <module name="ab-base-mapper" />
+        <module name="ab-org-core" />
+        <module name="ab-auth-api" />
+        <module name="ab-spring-boot-starter-security" />
+        <module name="ab-component-redis" />
+        <module name="ab-component-msg-engine" />
+        <module name="ab-org-api" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
